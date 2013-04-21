@@ -1,4 +1,4 @@
-package com.zhangwei.common.storage;
+package com.zhangwei.stock.common.storage;
 
 
 

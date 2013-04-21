@@ -5,7 +5,8 @@ import java.io.IOException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import com.zhangwei.gson.Stock;
+
+import com.zhangwei.stock.gson.Stock;
 
 public class TencentStockHelper {
 	private static TencentStockHelper ins;

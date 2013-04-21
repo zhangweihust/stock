@@ -1,4 +1,4 @@
-package com.zhangwei.gson;
+package com.zhangwei.stock.gson;
 
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -1,4 +1,4 @@
-package com.zhangwei.common.utils;
+package com.zhangwei.stock.common.utils;
 
 import android.view.LayoutInflater;
 import android.view.View;

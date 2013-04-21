@@ -1,4 +1,4 @@
-package com.zhangwei.gson;
+package com.zhangwei.stock.gson;
 
 /**
  *  质地优秀的股票条目<==>每天要扫描的股票

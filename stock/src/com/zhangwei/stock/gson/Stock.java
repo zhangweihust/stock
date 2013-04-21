@@ -1,4 +1,4 @@
-package com.zhangwei.gson;
+package com.zhangwei.stock.gson;
 
 public class Stock {
 

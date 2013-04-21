@@ -1,4 +1,4 @@
-package com.zhangwei.common.storage;
+package com.zhangwei.stock.common.storage;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -19,7 +19,7 @@ import java.util.Map.Entry;
 import cn.zipper.framwork.core.ZApplication;
 
 import com.google.gson.Gson;
-import com.zhangwei.common.utils.MD5;
+import com.zhangwei.stock.common.utils.MD5;
 
 import android.app.Activity;
 import android.content.Context;

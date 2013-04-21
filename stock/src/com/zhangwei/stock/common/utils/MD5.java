@@ -1,4 +1,4 @@
-package com.zhangwei.common.utils;
+package com.zhangwei.stock.common.utils;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;

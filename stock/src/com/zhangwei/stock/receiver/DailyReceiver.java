@@ -1,6 +1,6 @@
 package com.zhangwei.stock.receiver;
 
-import com.zhangwei.service.DailyStockScanService;
+import com.zhangwei.stock.service.DailyStockScanService;
 
 import android.content.Context;
 import android.content.Intent;

@@ -1,11 +1,11 @@
-package com.zhangwei.service;
+package com.zhangwei.stock.service;
 
 
 import java.util.Iterator;
 
-import com.zhangwei.gson.DailyList;
-import com.zhangwei.gson.GoodStock;
-import com.zhangwei.gson.Stock;
+import com.zhangwei.stock.gson.DailyList;
+import com.zhangwei.stock.gson.GoodStock;
+import com.zhangwei.stock.gson.Stock;
 import com.zhangwei.stock.net.TencentStockHelper;
 import com.zhangwei.stock.net.WifiHelper;
 import com.zhangwei.stock.receiver.DailyReceiver;

@@ -20,29 +20,29 @@
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name" >
-        <activity
-            android:name="com.zhangwei.stock.MainActivity"
-            android:label="@string/app_name" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <service android:name="com.zhangwei.service.DailyStockScanService"></service>
-        <receiver android:name="com.zhangwei.stock.receiver.NetworkConnectChangedReceiver" 
+        <receiver android:name=".receiver.NetworkConnectChangedReceiver" 
                   android:exported="false">
             <intent-filter android:priority="2147483647" >
                <action android:name="ACTION_WIFI_CONNECTED" />
             </intent-filter>
         </receiver>
         
-        <receiver android:name="com.zhangwei.stock.receiver.DailyReceiver" 
+        <receiver android:name=".receiver.DailyReceiver" 
                   android:exported="false">
             <intent-filter android:priority="2147483647" >
                 <action android:name="ACTION_REFRESH_VERSIONCHECK_ALARM" />
             </intent-filter>
-        </receiver>
+        </receiver> 
+        <activity
+            android:name=".MainActivity"
+            android:label="@string/app_name" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <service android:name=".service.DailyStockScanService"></service>
+
     </application>
 
 </manifest>

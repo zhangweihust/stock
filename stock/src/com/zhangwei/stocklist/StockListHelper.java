@@ -8,10 +8,10 @@ import android.content.res.AssetManager;
 import cn.zipper.framwork.core.ZApplication;
 
 import com.google.gson.Gson;
-import com.zhangwei.common.storage.StorageManager;
-import com.zhangwei.gson.DailyList;
-import com.zhangwei.gson.Stock;
-import com.zhangwei.gson.StockList;
+import com.zhangwei.stock.common.storage.StorageManager;
+import com.zhangwei.stock.gson.DailyList;
+import com.zhangwei.stock.gson.Stock;
+import com.zhangwei.stock.gson.StockList;
 
 public class StockListHelper {
 
