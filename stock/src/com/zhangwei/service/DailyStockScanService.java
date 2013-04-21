@@ -19,6 +19,8 @@ public class DailyStockScanService extends ZService {
 	private  AlarmManager alarms;
 	private  PendingIntent alarmIntent;
 	private  final long alarm_interval = 24*60*60*1000;  //24 hour
+	
+	private DailyStockScanTask lastLookup; 
 
 	
 	@Override
@@ -51,6 +53,15 @@ public class DailyStockScanService extends ZService {
 	public boolean handleMessage(Message msg) {
 		// TODO Auto-generated method stub
 		return false;
+	}
+	
+	public void refreshVersionCheck() {
+	    if (lastLookup==null ||
+	    		lastLookup.getStatus().equals(AsyncTask.Status.FINISHED)) {
+	      lastLookup = new DailyStockScanTask();
+	      lastLookup.execute(1);
+
+	    }
 	}
 
 	private class DailyStockScanTask extends AsyncTask<Integer,Void,Integer>{
