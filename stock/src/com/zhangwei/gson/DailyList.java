@@ -14,7 +14,7 @@ import android.util.Log;
  * */
 public class DailyList {
 	public transient static String ID = "_DailyList_";
-	public transient static DailyList ins;
+	//public transient static DailyList ins;
 
 	HashMap<String, GoodStock> map;
 	
@@ -27,7 +27,7 @@ public class DailyList {
 		map = new HashMap<String, GoodStock>();
 	}
 	
-	public static DailyList getInstance(){
+/*	public static DailyList getInstance(){
 		if(ins==null){
 			ins = new DailyList();
 			ins.lastScanTime = 0;
@@ -35,7 +35,7 @@ public class DailyList {
 		}
 		
 		return ins;
-	}
+	}*/
 	
 	public long getlastScanTime(){
 		return lastScanTime;
@@ -51,9 +51,9 @@ public class DailyList {
 	
 	public void updateDailyList(DailyList obj){
 		if(obj!=null){
-			ins.map.clear();
-			ins.map.putAll(obj.getDailyList());
-			ins.lastScanTime = obj.getlastScanTime();
+			map.clear();
+			map.putAll(obj.getDailyList());
+			lastScanTime = obj.getlastScanTime();
 		}
 
 	}
@@ -66,7 +66,6 @@ public class DailyList {
 		}else{
 			obj = new GoodStock();
 			obj.update(id, Rank, Trend, Quality);
-			Log.e("map-", "insert id" + id);
 			map.put(id, obj);
 		}
 	}

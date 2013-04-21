@@ -16,10 +16,15 @@ public class StockListHelper {
 
 	private static  StockListHelper ins;
 	private static String TAG = "StockList";
+	
 	private Context context;
-
+	private DailyList dailylist;
+	private StockList stocklist;
+	
 	private StockListHelper(){
 		context = ZApplication.getInstance();
+		dailylist = null;
+		stocklist = null;
 	}
 	
 	public static StockListHelper getInstance(){
@@ -31,51 +36,91 @@ public class StockListHelper {
 	}
 	
 	public StockList getList(){
-		StockList sl = (StockList) StorageManager.getInstance(null).getItem(StockList.ID, StockList.class);
-	
-	
-		if(sl==null || sl.status!=1){
-			//use default stock list in assets
-			AssetManager manager = context.getAssets();
-			try {
-				InputStream mInput = manager.open("stock_list");
-				// myData.txt can't be more than 2 gigs.
-	            int size = mInput.available();
-	            byte[] buffer = new byte[size];
-	            mInput.read(buffer);
-	            mInput.close();
-	 
-	            // byte buffer into a string
-	            String text = new String(buffer);
-	            Gson gson = new Gson();
-	            sl = gson.fromJson(text, StockList.class);
-				
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				return null;
-			}
-			
-
+		//1. from memory
+		if(stocklist!=null){
+			return stocklist;
 		}
 		
-		return sl;
+		//2. from internal storage
+		stocklist = (StockList) StorageManager.getInstance(null).getItem(StockList.ID, StockList.class);
+		if(stocklist!=null){
+			return stocklist;
+		}
+	
+		//3. from assets last
+		//use default stock list in assets
+		AssetManager manager = context.getAssets();
+		try {
+			InputStream mInput = manager.open("stock_list");
+			// myData.txt can't be more than 2 gigs.
+            int size = mInput.available();
+            byte[] buffer = new byte[size];
+            mInput.read(buffer);
+            mInput.close();
+ 
+            // byte buffer into a string
+            String text = new String(buffer);
+            Gson gson = new Gson();
+            stocklist = gson.fromJson(text, StockList.class);
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
+		return stocklist;
+	}
+	
+	public void persistStockList(StockList stocklist){
+
+		//save to internal storage
+		if(stocklist!=null){
+			StorageManager.getInstance(null).putItem(StockList.ID, stocklist, StockList.class);
+		}
+
 	}
 	
 	public DailyList getDailyList(){
-		DailyList dl = DailyList.getInstance();
-		if(dl.getlastScanTime()==0){
-			//new object, load from storage..
-			DailyList obj = (DailyList) StorageManager.getInstance(null).getItem(DailyList.ID, DailyList.class);
-		    dl.updateDailyList(obj);
+
+		//1. from memory
+		if(dailylist!=null){
+			return dailylist;
 		}
 		
+		//2. from internal storage
+		dailylist = (DailyList) StorageManager.getInstance(null).getItem(DailyList.ID, DailyList.class);
+		if(dailylist!=null){
+			return dailylist;
+		}
 		
-		return dl;
+		//3. from assets last
+		//use default stock list in assets
+		AssetManager manager = context.getAssets();
+		try {
+			InputStream mInput = manager.open("daily_list");
+			// myData.txt can't be more than 2 gigs.
+            int size = mInput.available();
+            byte[] buffer = new byte[size];
+            mInput.read(buffer);
+            mInput.close();
+ 
+            // byte buffer into a string
+            String text = new String(buffer);
+            Gson gson = new Gson();
+            dailylist = gson.fromJson(text, DailyList.class);
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
+		
+		return dailylist;
 	}
 	
 	public void persistDailyList(DailyList dlist){
 
+		//save to internal storage
 		if(dlist!=null){
 			StorageManager.getInstance(null).putItem(DailyList.ID, dlist, DailyList.class);
 		}

@@ -29,7 +29,7 @@ import android.util.Log;
  * @author zhangwei
  */
 public class StorageManager {
-	public static final String CHACHE_PREFIX = "s"; //"storage_";
+	public static final String CHACHE_PREFIX = "storage_";
 
 	private static final String TAG = "StorageManager";
 	private static StorageManager instance;
@@ -92,7 +92,7 @@ public class StorageManager {
 	public String getItem(String uri) {
 		//String key = MD5.encode(CHACHE_PREFIX, uri.getBytes());
 		//String key = MD5.encode(CHACHE_PREFIX, uri.getBytes());
-		String key = uri;
+		String key = CHACHE_PREFIX + uri;
 		if (cache.containsKey(key)) {
 			// Read the created file and display to the screen
 			try {
@@ -160,7 +160,7 @@ public class StorageManager {
 	 */
 	public StorageValue putItem(String uri, String objStr) {
 		//String key = MD5.encode(CHACHE_PREFIX, uri.getBytes());
-		String key = uri;
+		String key = CHACHE_PREFIX + uri;
 		FileOutputStream mOutput = null;
 		StorageValue result = null;
 		try {
@@ -204,7 +204,7 @@ public class StorageManager {
 	 *            要删除的资源uri
 	 */
 	public void deleteItem(String uri) {
-		String key = uri;
+		String key = CHACHE_PREFIX + uri;
 		//String key = MD5.encode(CHACHE_PREFIX, uri.getBytes());
 		if (cache.containsKey(key)) {
 			cache.remove(key);
