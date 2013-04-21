@@ -63,9 +63,23 @@ public class StockListHelper {
 	}
 	
 	public DailyList getDailyList(){
-		DailyList dl = (DailyList) StorageManager.getInstance(null).getItem(DailyList.ID, DailyList.class);
+		DailyList dl = DailyList.getInstance();
+		if(dl.getlastScanTime()==0){
+			//new object, load from storage..
+			DailyList obj = (DailyList) StorageManager.getInstance(null).getItem(DailyList.ID, DailyList.class);
+		    dl.updateDailyList(obj);
+		}
+		
 		
 		return dl;
+	}
+	
+	public void persistDailyList(DailyList dlist){
+
+		if(dlist!=null){
+			StorageManager.getInstance(null).putItem(DailyList.ID, dlist, DailyList.class);
+		}
+
 	}
 	
 }

@@ -52,6 +52,45 @@ public class GoodStock {
 	/**
 	 *  {@literal 现在的质地}
 	 * */
-	String Quality; 
+	String Quality;
+
+	/**
+	 *  如果Rank, Trend, Quality有任一值改变则更新时间，同时把现有的值插入到last值上,
+	 *  否则维持不变
+	 *  @param r rank
+	 *  @param t trend
+	 *  @param q quality
+	 *  @author zhangwei
+	 * */
+	public void update(String id, String r, String t, String q) {
+		// TODO Auto-generated method stub
+		this.id = id;
+
+		boolean hasChange = false;
+		if(r!=null && r.equals(this.Rank)){
+			this.lastRank = this.Rank;
+			this.Rank = r;
+			hasChange = true;
+		}
+
+		if(t!=null && t.equals(this.Trend)){
+			this.lastTrend = this.Trend;
+			this.Trend = t;
+			hasChange = true;
+		}
+		
+		if(q!=null && q.equals(this.Quality)){
+			this.lastQuality = this.Quality;
+			this.Quality = q;
+			hasChange = true;
+		}
+		
+		if(hasChange){
+			lastChangeTime = System.currentTimeMillis();
+		}
+
+	}
+
+
 	
 }

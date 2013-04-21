@@ -11,6 +11,7 @@ import org.jsoup.select.Elements;
 
 import cn.zipper.framwork.core.ZActivity;
 import com.zhangwei.common.storage.StorageManager;
+import com.zhangwei.gson.DailyList;
 import com.zhangwei.gson.Stock;
 import com.zhangwei.gson.StockList;
 import com.zhangwei.stocklist.StockListHelper;
@@ -26,6 +27,7 @@ import android.view.Menu;
 import android.view.View;
 
 public class MainActivity extends ZActivity {
+	private final String TAG = "MainActivity";
 	private final int HANDLER_FLAG_STOCK_PROCESS_DONE = 1;
 	
 	String histroy_trade_url = "http://vip.stock.finance.sina.com.cn/corp/go.php/vMS_MarketHistory/stockid/600031.phtml";
@@ -51,10 +53,8 @@ public class MainActivity extends ZActivity {
 		//show_history_trade();
 
 		//解析腾讯股票医生
-		//show_stock_doctor(sl.generateStockID(true));
-/*		show_stock_doctor("sz002605");*/
-		String next = sl.generateStockID(false);
-		stock_t.execute(next);
+		// --- String next = sl.generateStockID(false);
+		// ---- stock_t.execute(next);
 
 		//获取股票列表
 		//sl = new StockList();
@@ -62,9 +62,27 @@ public class MainActivity extends ZActivity {
 		//save_stock_list(stock_list_sz, 1);
 		//save_stock_list(stock_list_cyb, 2);
 
-/*		sl.status = 0;
-		sl.last_modify = System.currentTimeMillis();
-		StorageManager.getInstance(this).putItem("ddddd", sl, StockList.class);*/
+		DailyList dlist = StockListHelper.getInstance().getDailyList();
+		//获取质地优秀股票列表
+		StockList sl = StockListHelper.getInstance().getList();
+		String next = sl.generateStockID(true);
+		do{
+			Log.d(TAG, "next " + next);
+			Stock s = (Stock) StorageManager.getInstance(null).getItem(next, Stock.class);
+			if(s!=null){
+				Log.e("ddddd", s.quality);
+				if("优秀".equals(s.quality)){
+					Log.e(TAG, "优秀 " + next);
+					dlist.updateStock(s.id, s.rank, s.trend, s.quality);
+				}
+			}
+
+			
+			next = sl.generateStockID(false);
+		}while(next!=null);
+
+		StockListHelper.getInstance().persistDailyList(dlist);
+		
 		Log.e("jsoup", "Ok done");
 	}
 	
