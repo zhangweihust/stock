@@ -30,9 +30,11 @@ import android.util.Log;
 import cn.zipper.framwork.service.ZService;
 
 public class DailyStockScanService extends ZService {
+	private final String TAG = "DailyStockScanService";
 	
 	private  AlarmManager alarms;
 	private  PendingIntent alarmIntent;
+	DailyList dailylist;
 	private  final long alarm_interval = 24*60*60*1000;  //24 hour
 	
 	private DailyStockScanTask lastLookup;   
@@ -44,6 +46,7 @@ public class DailyStockScanService extends ZService {
 	@Override
 	public void onCreate() {
 		super.onCreate();
+		Log.e(TAG, "onCreate");
 	
 	    alarms = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
 
@@ -69,7 +72,7 @@ public class DailyStockScanService extends ZService {
 		  public void onReceive(Context context, Intent intent) {
 		    // Get extra data included in the Intent
 		    //String message = intent.getStringExtra("message");
-		    //Log.d("receiver", "Got message: " + message);
+		    Log.d("mWifiStatusReceiver", "Got message HANDLER_FLAG_WIFI_CONNECTED" );
 		    
 		    //Message msg = handler.obtainMessage(HANDLER_FLAG_WIFI_CONNECTED);
 		    handler.sendEmptyMessageDelayed(HANDLER_FLAG_WIFI_CONNECTED, 10000);
@@ -81,6 +84,7 @@ public class DailyStockScanService extends ZService {
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
+		Log.e(TAG, "onDestroy");
 		
 		this.unregisterReceiver(myBroadcastReceiver);
 		
@@ -90,13 +94,14 @@ public class DailyStockScanService extends ZService {
 	
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) { 
+		Log.e(TAG, "onStartCommand, flags:" + flags + " startId" + startId);
 		
 	    int alarmType = AlarmManager.ELAPSED_REALTIME_WAKEUP;
 	    long timeToRefresh = SystemClock.elapsedRealtime() + alarm_interval;
 	    alarms.setRepeating(alarmType, timeToRefresh, alarm_interval, alarmIntent);  
 	    
 	    //alarms.cancel(alarmIntent);
-	    DailyList dailylist = StockListHelper.getInstance().getDailyList();
+	    dailylist = StockListHelper.getInstance().getDailyList();
 	    
 		refreshVersionCheck(dailylist.getlastScanID());
 
@@ -108,6 +113,7 @@ public class DailyStockScanService extends ZService {
 		// TODO Auto-generated method stub
 		switch(msg.what){
 		case HANDLER_FLAG_TASK_COMPLETE:
+			Log.e(TAG, "handle task complete, stopSelf");
 			this.stopSelf();
 			break;
 			
@@ -115,8 +121,12 @@ public class DailyStockScanService extends ZService {
 			//只有在service活着的时候才能接收局部广播并重启service
 			//应用在一次异步任务已退出，但没有完成（没有发出HANDLER_FLAG_TASK_COMPLETE）
 			//这时的service还没有结束，等待网络状态的改变
-			Intent startIntent = new Intent(this, DailyStockScanService.class);
-		    this.startService(startIntent);
+			Log.e(TAG, "handle wifi connected, refreshVersionCheck");
+/*			Intent startIntent = new Intent(this, DailyStockScanService.class);
+		    this.startService(startIntent);*/
+			dailylist = StockListHelper.getInstance().getDailyList();
+			refreshVersionCheck(dailylist.getlastScanID());
+		    break;
 		}
 		return false;
 	}
@@ -176,20 +186,25 @@ public class DailyStockScanService extends ZService {
 					}
 					continue;
 				}
+				
+				Log.e(TAG, "lastStockID:" + lastStockID);
 
 				//check net, only wifi can run
 				if(!WifiHelper.VALUE_WIFI.equals(WifiHelper.getNetType())){
+					Log.e(TAG, "WifiHelper,  status:" + WifiHelper.getNetType() + " gs" + gs.id);
 					isAbort = true;
 					break;
 				}
 				
 				if(isCancelled()){
+					Log.e(TAG, "isCancelled, gs:" + gs.id);
 					isAbort = true;
 					break;
 				}
 				
 				Stock stock = TencentStockHelper.getInstance().get_stock_from_doctor(gs.id);
 				if(stock!=null){
+					Log.e(TAG, "a stock done,  stock.id:" + stock.id);
 					dailylist.updateStock(stock);
 					
 					//实时记录扫描的id到dailyList中
@@ -202,12 +217,15 @@ public class DailyStockScanService extends ZService {
 				}
 
 			}
+			
+			Log.e(TAG, "loop over, update:" + update + " isAbort:" + isAbort + " completeID:" + completeID);
 
 			if(update){
 				if(!isAbort){
 					//完成这次扫描(中途被终止的不算)，记录时间
 					dailylist.setlastScanTime(System.currentTimeMillis());
 				}
+				Log.e(TAG, "persistDailyList!");
 				StockListHelper.getInstance().persistDailyList(dailylist);
 			}
 

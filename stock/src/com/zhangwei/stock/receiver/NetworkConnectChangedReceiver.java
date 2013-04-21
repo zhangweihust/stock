@@ -7,6 +7,7 @@ import android.net.NetworkInfo.State;
 import android.net.wifi.WifiManager;
 import android.os.Parcelable;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 import cn.zipper.framwork.core.ZBroadcastReceiver;
 
 public class NetworkConnectChangedReceiver extends ZBroadcastReceiver {
@@ -31,6 +32,7 @@ public class NetworkConnectChangedReceiver extends ZBroadcastReceiver {
 					Intent intent_to_send = new Intent(ACTION_WIFI_CONNECTED);
 					// You can also include some extra data.
 					//intent_to_send.putExtra("message", "This is my message!");
+					Log.e("NetworkConnectChangedReceiver", "onReceive send ACTION_WIFI_CONNECTED" );
 					LocalBroadcastManager.getInstance(context).sendBroadcast(intent_to_send);
 					
 					

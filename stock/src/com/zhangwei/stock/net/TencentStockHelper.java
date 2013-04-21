@@ -41,7 +41,7 @@ public class TencentStockHelper {
 			
 			Document doc = null;
 			String connect_url = doctor_url_prefix + stockID + ".html";
-			doc = Jsoup.connect(connect_url).timeout(0).get();
+			doc = Jsoup.connect(connect_url).timeout(30000).get();
 			
 			//rank
 			Element lefttd = doc.body().getElementById("lefttd");
