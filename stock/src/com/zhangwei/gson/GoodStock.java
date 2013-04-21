@@ -1,7 +1,7 @@
 package com.zhangwei.gson;
 
 /**
- *  质地优秀的股票条目
+ *  质地优秀的股票条目<==>每天要扫描的股票
  *  支持记录rank、趋势和质地的变化，时间，方向
  *  支持关注和取消关注
  *  
@@ -12,7 +12,7 @@ public class GoodStock {
 	/**
 	 *  {@literal 股票id， sh600031}
 	 * */
-	String id;
+	public String id;
 
 	/**
 	 *  {@literal 用户是否关注}

@@ -2,6 +2,7 @@ package com.zhangwei.gson;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import android.util.Log;
 
@@ -16,7 +17,12 @@ public class DailyList {
 	public transient static String ID = "_DailyList_";
 	//public transient static DailyList ins;
 
-	HashMap<String, GoodStock> map;
+	LinkedHashMap<String, GoodStock> map;
+	
+	/**
+	 *  {@literal 上次扫描的stockid， sh600031}
+	 * */
+	String lastScanID;
 	
 	/**
 	 *  {@literal 上次完成列表扫描的时间}
@@ -24,7 +30,7 @@ public class DailyList {
 	long lastScanTime;
 	
 	private DailyList(){
-		map = new HashMap<String, GoodStock>();
+		map = new LinkedHashMap<String, GoodStock>();
 	}
 	
 /*	public static DailyList getInstance(){
@@ -37,6 +43,14 @@ public class DailyList {
 		return ins;
 	}*/
 	
+	public String getlastScanID(){
+		return lastScanID;
+	}
+	
+	public void setlastScanID(String id){
+		lastScanID = id;
+	}
+	
 	public long getlastScanTime(){
 		return lastScanTime;
 	}
@@ -45,17 +59,27 @@ public class DailyList {
 		lastScanTime = time;
 	}
 	
-	public HashMap<String, GoodStock> getDailyList(){
+	public LinkedHashMap<String, GoodStock> getDailyMap(){
 		return map;
 	}
 	
 	public void updateDailyList(DailyList obj){
 		if(obj!=null){
 			map.clear();
-			map.putAll(obj.getDailyList());
+			map.putAll(obj.getDailyMap());
 			lastScanTime = obj.getlastScanTime();
 		}
 
+	}
+	
+	/**
+	 *  将Stock信息更新到GoodStock
+	 *  <li>Stock侧重于股票详细信息
+	 *  <li>GoodStock侧重于股票的变化
+	 * 
+	 * */
+	public void updateStock(Stock stock){
+		updateStock(stock.id, stock.rank, stock.trend, stock.quality);
 	}
 	
 	public void updateStock(String id, String Rank, String Trend, String Quality){

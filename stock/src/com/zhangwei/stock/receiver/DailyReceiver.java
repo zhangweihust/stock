@@ -7,7 +7,7 @@ import android.content.Intent;
 import cn.zipper.framwork.core.ZBroadcastReceiver;
 
 public class DailyReceiver extends ZBroadcastReceiver {
-	public static final String ACTION_REFRESH_VERSIONCHECK_ALARM = "ACTION_REFRESH_DAILYSCAN_ALARM";
+	public static final String ACTION_REFRESH_DAILYSCAN_ALARM = "ACTION_REFRESH_DAILYSCAN_ALARM";
 		
 	@Override
 	public void onReceive(Context context, Intent intent) {

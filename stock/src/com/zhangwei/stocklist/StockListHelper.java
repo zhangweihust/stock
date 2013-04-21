@@ -10,6 +10,7 @@ import cn.zipper.framwork.core.ZApplication;
 import com.google.gson.Gson;
 import com.zhangwei.common.storage.StorageManager;
 import com.zhangwei.gson.DailyList;
+import com.zhangwei.gson.Stock;
 import com.zhangwei.gson.StockList;
 
 public class StockListHelper {
@@ -127,4 +128,13 @@ public class StockListHelper {
 
 	}
 	
+	
+	public void persistStock(Stock stock){
+
+		//save to internal storage
+		if(stock!=null){
+			StorageManager.getInstance(null).putItem(stock.id, stock, Stock.class);
+		}
+
+	}
 }

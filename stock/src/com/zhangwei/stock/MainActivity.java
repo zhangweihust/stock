@@ -14,6 +14,7 @@ import com.zhangwei.common.storage.StorageManager;
 import com.zhangwei.gson.DailyList;
 import com.zhangwei.gson.Stock;
 import com.zhangwei.gson.StockList;
+import com.zhangwei.service.DailyStockScanService;
 import com.zhangwei.stocklist.StockListHelper;
 
 
@@ -22,6 +23,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Message;
 import android.app.Activity;
+import android.content.Intent;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
@@ -46,9 +48,12 @@ public class MainActivity extends ZActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		
-		sl = StockListHelper.getInstance().getList();
+		Intent intent=new Intent(MainActivity.this, DailyStockScanService.class);  
+		startService(intent);
+		
+/*		sl = StockListHelper.getInstance().getList();
 		stock_t = new StockTask();
-
+*/
 		//解析sina历史交易记录
 		//show_history_trade();
 
@@ -62,7 +67,7 @@ public class MainActivity extends ZActivity {
 		//save_stock_list(stock_list_sz, 1);
 		//save_stock_list(stock_list_cyb, 2);
 
-		DailyList dlist = StockListHelper.getInstance().getDailyList();
+/*		DailyList dlist = StockListHelper.getInstance().getDailyList();
 		//获取质地优秀股票列表
 		StockList sl = StockListHelper.getInstance().getList();
 		String next = sl.generateStockID(true);
@@ -81,7 +86,7 @@ public class MainActivity extends ZActivity {
 			next = sl.generateStockID(false);
 		}while(next!=null);
 
-		StockListHelper.getInstance().persistDailyList(dlist);
+		StockListHelper.getInstance().persistDailyList(dlist);*/
 		
 		Log.e("jsoup", "Ok done");
 	}
