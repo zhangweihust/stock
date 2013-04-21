@@ -29,7 +29,7 @@ import android.util.Log;
  * @author zhangwei
  */
 public class StorageManager {
-	public static final String CHACHE_PREFIX = "storage_";
+	public static final String CHACHE_PREFIX = "storage_";  
 
 	private static final String TAG = "StorageManager";
 	private static StorageManager instance;
