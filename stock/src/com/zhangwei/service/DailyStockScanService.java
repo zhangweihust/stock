@@ -20,7 +20,7 @@ public class DailyStockScanService extends ZService {
 	private  PendingIntent alarmIntent;
 	private  final long alarm_interval = 24*60*60*1000;  //24 hour
 	
-	private DailyStockScanTask lastLookup; 
+	private DailyStockScanTask lastLookup;   
 
 	
 	@Override
