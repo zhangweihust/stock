@@ -1,7 +1,10 @@
 package com.zhangwei.stock.service;
 
 
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 import com.zhangwei.stock.gson.DailyList;
 import com.zhangwei.stock.gson.GoodStock;
@@ -27,6 +30,8 @@ import android.os.Message;
 import android.os.SystemClock;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import cn.zipper.framwork.io.network.ZHttp2;
+import cn.zipper.framwork.io.network.ZHttpResponse;
 import cn.zipper.framwork.service.ZService;
 
 public class DailyStockScanService extends ZService {
@@ -38,6 +43,7 @@ public class DailyStockScanService extends ZService {
 	private  final long alarm_interval = 24*60*60*1000;  //24 hour
 	
 	private DailyStockScanTask lastLookup;   
+	private KudnsRefreshTask lastRefresh;  
 	private final int HANDLER_FLAG_TASK_COMPLETE =  0x12345678;
 	private final int HANDLER_FLAG_WIFI_CONNECTED = 0x12345679;
 	
@@ -126,6 +132,8 @@ public class DailyStockScanService extends ZService {
 		    this.startService(startIntent);*/
 			dailylist = StockListHelper.getInstance().getDailyList();
 			refreshVersionCheck(dailylist.getlastScanID());
+			
+			refreshKudns_com();
 		    break;
 		}
 		return false;
@@ -138,6 +146,53 @@ public class DailyStockScanService extends ZService {
 	      lastLookup.execute(stockID);
 
 	    }
+	}
+	
+	
+	public void refreshKudns_com() {
+	    if (lastRefresh==null ||
+	    		lastRefresh.getStatus().equals(AsyncTask.Status.FINISHED)) {
+	    	lastRefresh = new KudnsRefreshTask();
+	    	lastRefresh.execute();
+
+	    }
+	}
+	
+	private class KudnsRefreshTask extends AsyncTask<Void,Void,Void>{
+
+		@Override
+		protected Void doInBackground(Void... arg0) {
+			// TODO Auto-generated method stub
+			//GET /islogin.php HTTP/1.1 (必须，得到PHPSESSID)
+			HashMap<String, String> headers = new HashMap<String, String>();
+			String cookie_str = "Hm_lvt_33ea14b096016df36e0a555e947b927e=1365233496,1365298626,1366705886;";
+			headers.put("User-Agent", "Mozilla/5.0 (Windows NT 5.1) AppleWebKit/537.31 (KHTML, like Gecko) Chrome/26.0.1410.64 Safari/537.31");
+			headers.put("Cookie", cookie_str);
+			ZHttp2 http2 = new ZHttp2();
+			http2.setHeaders(headers);
+			ZHttpResponse httpResponse = http2.get("http://www.kudns.com/islogin.php");
+			Map<String, List<String>> ret = httpResponse.getHeaders();
+			List<String> list = ret.get("Set-Cookie");
+			Log.e(TAG, "set-cookie:" + list.get(0));
+			
+			//POST /user/ilogin.php HTTP/1.1  （必须，登陆， 让phpsession合法）
+			headers.put("Cookie", cookie_str + " " + list.get(0) + ";");
+			String post_data = "username=hustwei&pwd=lmx%401984&submit=%26%23160%3B%26%23160%3B%26%23160%3B%26%23160%3B";
+			httpResponse = http2.post("http://www.kudns.com/user/ilogin.php", post_data.getBytes());
+			
+			ret = httpResponse.getHeaders();
+
+			
+			
+			
+			//GET /user/host/add_date.php?Tid=81343 HTTP/1.1
+			headers.put("Cookie", cookie_str + " " + list.get(0) + ";");
+			http2.get("http://www.kudns.com/user/host/add_date.php?Tid=81343");
+			
+			
+			return null;
+		}
+		
 	}
 
 	/**
