@@ -15,6 +15,7 @@ import com.zhangwei.stock.common.storage.StorageManager;
 import com.zhangwei.stock.gson.DailyList;
 import com.zhangwei.stock.gson.Stock;
 import com.zhangwei.stock.gson.StockList;
+import com.zhangwei.stock.net.TencentStockHelper;
 import com.zhangwei.stock.service.DailyStockScanService;
 import com.zhangwei.stocklist.StockListHelper;
 
@@ -50,7 +51,9 @@ public class MainActivity extends ZActivity {
 		setContentView(R.layout.activity_main);
 		
 		Intent intent=new Intent(MainActivity.this, DailyStockScanService.class);  
-		startService(intent);
+		//@@@@ startService(intent);
+		
+		TencentStockHelper.getInstance().fetch_ycgz(new Stock("sh600315"));
 		
 /*		sl = StockListHelper.getInstance().getList();
 		stock_t = new StockTask();

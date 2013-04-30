@@ -7,6 +7,8 @@ public class Stock {
 	public String name; //浦发银行
 	public String id;   //sh600000
 	
+	public String scan_date; //20130501
+	
 	//从腾讯医生获取的信息：http://stockapp.finance.qq.com/doctor/sz002605.html
 	public String rank; //排名： A 
 	public String info; //概况： 有大资金参与 筹码趋于集中
@@ -90,6 +92,91 @@ public class Stock {
 	public String quality; //股票质地: 优秀
 	public String quality_detail; //1.成本控制较好
 	                              //2.现金流充裕
+	
+	/**
+	 *  http://stockhtm.finance.qq.com/sstock/quotpage/q/300315.htm#ycgz
+	 *  英策点评 - 接近当前股价估值区间 47.83元 ~ 52.60元
+	 * */
+	public String stockEstimateLowValue; //47.83
+	/**
+	 *  http://stockhtm.finance.qq.com/sstock/quotpage/q/300315.htm#ycgz
+	 *  英策点评 - 接近当前股价估值区间 47.83元 ~ 52.60元
+	 * */
+	public String stockEstimateHighValue; //52.60
+	
+	/**
+	 *  http://stockhtm.finance.qq.com/sstock/quotpage/q/300315.htm#ycgz
+	 *  英策点评 - 公司品质: 优秀
+	 * */
+	public String stockQuality;
+	/**
+	 * 掌趣科技(300315)2011年营业收入为1.84亿元，同比上年增长56.55%，净利润为0.56亿元，同比上年增长34.72%，净资产为2.24亿元，同比上年增长33.11%。根据机构最新预测，公司2012年净利润为0.90亿元，同比上年增长61.64%，净资产为15.66亿元，同比上年增长599.46%，每股收益为0.55元，同比上年增长21.23%，每股净资产为9.57元，同比上年增长424.59%。综合以上数据分析，根据英策咨询的评价标准，掌趣科技的公司品质为优秀。
+	 * */
+	public String stockQuality_detail;
+	
+	/**
+	 *  http://stockhtm.finance.qq.com/sstock/quotpage/q/300315.htm#ycgz
+	 *  英策点评 - 增长速度: 高速增长
+	 * */
+	public String stockIncrement;
+	/**
+	 * 公司上年营业收入、净利润和今年预测净利润的增长率分别为56.55%,34.72%和61.64%,属于高速增长企业。
+	 * */
+	public String stockIncrement_detail;
+	
+	/**
+	 *  http://stockhtm.finance.qq.com/sstock/quotpage/q/300315.htm#ycgz
+	 *  英策点评 - 资本安全: 很安全
+	 * */
+	public String stockSafe;
+	/**
+	 * 数据显示，公司上年资产负债率为6%,资本安全度极高。
+	 * */
+	public String stockSafe_detail;
+	
+	/**
+	 *  http://stockhtm.finance.qq.com/sstock/quotpage/q/300315.htm#ycgz
+	 *  英策点评 - 市场价值: 低估不明显
+	 * */
+	public String stockMarketValue;
+	/**
+	 *  在按照5种估值方法计算出的每股价值中，3项高于当前价/收盘价，英策估值网认为公司股票低估不明显。
+	 * */
+	public String stockMarketValue_detail;
+	
+	/**
+	 *  http://stockhtm.finance.qq.com/sstock/quotpage/q/300315.htm#ycgz
+	 *  英策点评 - 资产价值: 一般高估
+	 * */
+	public String stockAssetValue;
+	/**
+	 *  公司股价比按平均市净率法计算出的每股价值高11.85%，表明公司资产价值被一般高估。
+	 * */
+	public String stockAssetValue_detail;
+	
+	/**
+	 *  http://stockhtm.finance.qq.com/sstock/quotpage/q/300315.htm#ycgz
+	 *  英策点评 - 收益价值: 严重高估
+	 * */
+	public String stockReturnValue;
+	/**
+	 *  公司股价比按平均市盈率法计算出的每股价值高93.88%，表明公司收益价值被严重高估。
+	 * */
+	public String stockReturnValue_detail;
+	
+	public String YC_Time; //更新时间：2012-12-14（交易日19:00-19:30更新）
+	
+	/**
+	 *  http://stockhtm.finance.qq.com/sstock/quotpage/q/300315.htm#ycgz
+	 *  英策点评 - 行业及市值规模: 公司属电子信息；本公司流通市值为 9亿元,属于小盘股范畴。
+	 * */
+	public String Category; //电子信息
+	/**
+	 *  本公司流通市值为 9亿元
+	 * */
+	public String MarketValue; // 9亿元
+	public String Size;        // 小盘股范畴
+	
 	/**
 	 *  @param id sh600031
 	 *  @param name 三一重工
@@ -113,6 +200,10 @@ public class Stock {
 		this.trend_detail = trend_detail;
 		this.quality = quality;
 		this.quality_detail = quality_detail;
+	}
+	
+	public Stock(String id){
+		this.id = id;
 	}
 	
 }

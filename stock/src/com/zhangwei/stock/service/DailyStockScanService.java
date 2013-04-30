@@ -9,6 +9,7 @@ import java.util.Map;
 import com.zhangwei.stock.gson.DailyList;
 import com.zhangwei.stock.gson.GoodStock;
 import com.zhangwei.stock.gson.Stock;
+import com.zhangwei.stock.gson.StockList;
 import com.zhangwei.stock.net.TencentStockHelper;
 import com.zhangwei.stock.net.WifiHelper;
 import com.zhangwei.stock.receiver.DailyReceiver;
@@ -40,9 +41,10 @@ public class DailyStockScanService extends ZService {
 	private  AlarmManager alarms;
 	private  PendingIntent alarmIntent;
 	DailyList dailylist;
+	StockList stocklist;
 	private  final long alarm_interval = 24*60*60*1000;  //24 hour
 	
-	private DailyStockScanTask lastLookup;   
+	private DailyGoodStockScanTask lastLookup;   
 	private KudnsRefreshTask lastRefresh;  
 	private final int HANDLER_FLAG_TASK_COMPLETE =  0x12345678;
 	private final int HANDLER_FLAG_WIFI_CONNECTED = 0x12345679;
@@ -109,7 +111,9 @@ public class DailyStockScanService extends ZService {
 	    //alarms.cancel(alarmIntent);
 	    dailylist = StockListHelper.getInstance().getDailyList();
 	    
-		refreshVersionCheck(dailylist.getlastScanID());
+		DailyGoodStockScan(dailylist.getlastScanID());
+		
+		stocklist = StockListHelper.getInstance().getList();
 
 		return Service.START_NOT_STICKY;
 	}
@@ -131,18 +135,18 @@ public class DailyStockScanService extends ZService {
 /*			Intent startIntent = new Intent(this, DailyStockScanService.class);
 		    this.startService(startIntent);*/
 			dailylist = StockListHelper.getInstance().getDailyList();
-			refreshVersionCheck(dailylist.getlastScanID());
+			DailyGoodStockScan(dailylist.getlastScanID());
 			
-			refreshKudns_com();
+			//refreshKudns_com();
 		    break;
 		}
 		return false;
 	}
 	
-	public void refreshVersionCheck(String stockID) {
+	public void DailyGoodStockScan(String stockID) {
 	    if (lastLookup==null ||
 	    		lastLookup.getStatus().equals(AsyncTask.Status.FINISHED)) {
-	      lastLookup = new DailyStockScanTask(handler);
+	      lastLookup = new DailyGoodStockScanTask(handler);
 	      lastLookup.execute(stockID);
 
 	    }
@@ -202,7 +206,7 @@ public class DailyStockScanService extends ZService {
 	 * 
 	 *  @author zhangwei
 	 * */
-	private class DailyStockScanTask extends AsyncTask<String,Void,String>{
+	private class DailyGoodStockScanTask extends AsyncTask<String,Void,String>{
 
 		private Handler handler;
 		private boolean update;
@@ -210,7 +214,7 @@ public class DailyStockScanService extends ZService {
 		private boolean isAbort;
 		private String completeID;
 		
-		public DailyStockScanTask(Handler handler) {
+		public DailyGoodStockScanTask(Handler handler) {
 			// TODO Auto-generated constructor stub
 			this.handler = handler;
 			update = false;
@@ -257,7 +261,7 @@ public class DailyStockScanService extends ZService {
 					break;
 				}
 				
-				Stock stock = TencentStockHelper.getInstance().get_stock_from_doctor(gs.id);
+				Stock stock = TencentStockHelper.getInstance().get_stock_from_tencent(gs.id);
 				if(stock!=null){
 					Log.e(TAG, "a stock done,  stock.id:" + stock.id);
 					dailylist.updateStock(stock);
