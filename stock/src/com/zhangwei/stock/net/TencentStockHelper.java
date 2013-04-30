@@ -254,8 +254,6 @@ public class TencentStockHelper {
 				}
 			}
 
-			int i=0;
-			i++;
 
 			
 		} catch (IOException e) {

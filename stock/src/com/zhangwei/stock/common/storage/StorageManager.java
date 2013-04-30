@@ -66,8 +66,24 @@ public class StorageManager {
 		FilenameFilter filter = new CacheFilter();
 		File[] filelist = context.getFilesDir().listFiles(filter);
 		for (File f : filelist) {
-			cache.put(f.getName(),
-					new StorageValue(f.getName(), (int) f.length()));
+			if(f.isFile()){
+				cache.put(f.getName(), new StorageValue(f.getName(), (int) f.length()));
+			}else if(f.isDirectory()){
+				load(f) ;
+			}
+		}
+	}
+	
+	private void load(File fileDir) {
+		FilenameFilter filter = new CacheFilter();
+		File[] filelist = fileDir.listFiles(filter);
+		for (File f : filelist) {
+			if(f.isFile()){
+				cache.put(f.getName(), new StorageValue(f.getName(), (int) f.length()));
+			}else if(f.isDirectory()){
+				load(f) ;
+			}
+			
 		}
 	}
 
@@ -158,14 +174,28 @@ public class StorageManager {
 	 * @param uri 要查找的资源uri
 	 * @param objStr 将json String作为内容写入内存储(overwrite)
 	 */
-	public StorageValue putItem(String uri, String objStr) {
+	public StorageValue putItem(String dir, String uri, String objStr) {
 		//String key = MD5.encode(CHACHE_PREFIX, uri.getBytes());
+
 		String key = CHACHE_PREFIX + uri;
 		FileOutputStream mOutput = null;
 		StorageValue result = null;
+		String path;
+		
+		if(dir!=null){
+			File fileDir= new File(dir);
+			if(!fileDir.exists()) {
+				fileDir.mkdirs();
+			}
+			
+			path = dir + "/" + key;
+		}else{
+			path = key;
+		}
+		
 		try {
 			// overwrite
-			mOutput = context.openFileOutput(key, Activity.MODE_PRIVATE);
+			mOutput = context.openFileOutput(path, Activity.MODE_PRIVATE);
 			mOutput.write(objStr.getBytes());
 			mOutput.close();
 			result = cache.put(key, new StorageValue(key,
@@ -187,12 +217,12 @@ public class StorageManager {
 	 * @param object json Object
 	 * @param cls json对象类型
 	 */
-	public StorageValue putItem(String uri, Object object, Class<?> cls) {
+	public StorageValue putItem(String dir, String file, Object object, Class<?> cls) {
 
 		String jsonStr = null;
 		jsonStr = gson.toJson(object, cls);
 		if (jsonStr != null) {
-			return putItem(uri, jsonStr);
+			return putItem(dir, file, jsonStr);
 		} else {
 			return null;
 		}

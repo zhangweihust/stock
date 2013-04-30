@@ -10,6 +10,16 @@ public class StockList {
 	
 	public int status; //1 when ok
 	public long last_modify;  //列表上次更新时间
+	
+	/**
+	 *  {@literal 上次扫描的stockid， sh600031}
+	 * */
+	String lastScanID;
+	
+	/**
+	 *  {@literal 上次完成列表扫描的时间}
+	 * */
+	long lastScanTime;
 	////////////////////////////////////////////
 
 	public transient static String ID = "_StockList_";
@@ -19,6 +29,22 @@ public class StockList {
 		shenzheng_list = new ArrayList<String>();
 		chuangye_list = new ArrayList<String>();
 		index = 0;
+	}
+	
+	public boolean seekTo(String stockID){
+		boolean found = false;
+		if(shangzheng_list.contains(stockID)){
+			found = true;
+			index = shangzheng_list.indexOf(stockID);
+		}else if(shenzheng_list.contains(stockID)){
+			found = true;
+			index = shangzheng_list.indexOf(stockID) + shangzheng_list.size();
+		}else if(chuangye_list.contains(stockID)){
+			found = true;
+			index = shangzheng_list.indexOf(stockID) + shangzheng_list.size() + shenzheng_list.size();
+		}
+		
+		return found;
 	}
 	
 	public String generateStockID(boolean reset){
@@ -45,6 +71,23 @@ public class StockList {
 		}
 		
 		return ret;
+	}
+	
+	
+	public String getlastScanID(){
+		return lastScanID;
+	}
+	
+	public void setlastScanID(String id){
+		lastScanID = id;
+	}
+	
+	public long getlastScanTime(){
+		return lastScanTime;
+	}
+	
+	public void setlastScanTime(long time){
+		lastScanTime = time;
 	}
 	
 

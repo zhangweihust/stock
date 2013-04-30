@@ -119,21 +119,30 @@ public class StockListHelper {
 		return dailylist;
 	}
 	
-	public void persistDailyList(DailyList dlist){
+	/*public void persistDailyList(DailyList dlist){
 
 		//save to internal storage
 		if(dlist!=null){
 			StorageManager.getInstance(null).putItem(DailyList.ID, dlist, DailyList.class);
 		}
 
-	}
+	}*/
 	
 	
-	public void persistStock(Stock stock){
+	public void persistLastStock(Stock stock){
 
 		//save to internal storage
 		if(stock!=null){
-			StorageManager.getInstance(null).putItem(stock.id, stock, Stock.class);
+			StorageManager.getInstance(null).putItem("last", stock.id, stock, Stock.class);
+		}
+
+	}
+	
+	public void persistHistoryStock(String date, Stock stock){
+
+		//save to internal storage
+		if(stock!=null){
+			StorageManager.getInstance(null).putItem("history/" + date, stock.id, stock, Stock.class);
 		}
 
 	}

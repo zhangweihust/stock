@@ -198,6 +198,98 @@ public class DailyStockScanService extends ZService {
 		}
 		
 	}
+	
+	/**
+	 * 
+	 *  @param 输入 上次记录的stock: sh600031(上次已完成)
+	 *  @param 输出 这次完成的stock： sh600032
+	 * 
+	 *  @author zhangwei
+	 * */
+	private class DailyStockScanTask extends AsyncTask<String,Void,String>{
+
+		private Handler handler;
+		private boolean update;
+		private boolean findIndex;
+		private boolean isAbort;
+		private String completeID;
+		
+		public DailyStockScanTask(Handler handler) {
+			// TODO Auto-generated constructor stub
+			this.handler = handler;
+			update = false;
+			findIndex = false;
+			isAbort = false;
+			completeID = null;
+		}
+
+		@Override
+		protected String doInBackground(String... params) {
+			// TODO Auto-generated method stub
+			String lastStockID = params[0];
+			StockList stocklist = StockListHelper.getInstance().getList();
+			boolean reset = true;
+			if(lastStockID!=null){
+				reset = !stocklist.seekTo(lastStockID);
+			}
+			
+			String stockID = stocklist.generateStockID(reset);
+			do{
+				Log.e(TAG, "lastStockID:" + lastStockID);
+
+				//check net, only wifi can run
+				if(!WifiHelper.VALUE_WIFI.equals(WifiHelper.getNetType())){
+					Log.e(TAG, "WifiHelper,  status:" + WifiHelper.getNetType() + " stockID" + stockID);
+					isAbort = true;
+					break;
+				}
+				
+				if(isCancelled()){
+					Log.e(TAG, "isCancelled, stockID:" + stockID);
+					isAbort = true;
+					break;
+				}
+				
+				Stock stock = TencentStockHelper.getInstance().get_stock_from_tencent(stockID);
+				if(stock!=null){
+					Log.e(TAG, "a stock done,  stock.id:" + stock.id);
+					
+					//实时记录扫描的id到dailyList中
+					stocklist.setlastScanID(stock.id);
+					update = true;
+					completeID = stock.id;
+					
+					//save stock into internal storage
+					StockListHelper.getInstance().persistStock(stock);
+				}
+				
+			}while(stockID!=null);
+
+
+			
+			Log.e(TAG, "loop over, update:" + update + " isAbort:" + isAbort + " completeID:" + completeID);
+
+			if(update){
+				if(!isAbort){
+					//完成这次扫描(中途被终止的不算)，记录时间
+					dailylist.setlastScanTime(System.currentTimeMillis());
+				}
+				Log.e(TAG, "persistDailyList!");
+				StockListHelper.getInstance().persistDailyList(dailylist);
+			}
+
+			
+			return completeID;
+		}
+		
+		protected void onPostExecute(String result) {  
+			if(!isAbort){
+				//Message msg = handler.obtainMessage(HANDLER_FLAG_TASK_COMPLETE);
+				//msg.sendToTarget();
+				handler.sendEmptyMessage(HANDLER_FLAG_TASK_COMPLETE);
+			}
+		}  
+	}
 
 	/**
 	 * 
