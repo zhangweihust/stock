@@ -1,11 +1,13 @@
 package com.zhangwei.stock.service;
 
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import com.zhangwei.stock.common.utils.DateUtils;
 import com.zhangwei.stock.gson.DailyList;
 import com.zhangwei.stock.gson.GoodStock;
 import com.zhangwei.stock.gson.Stock;
@@ -40,11 +42,11 @@ public class DailyStockScanService extends ZService {
 	
 	private  AlarmManager alarms;
 	private  PendingIntent alarmIntent;
-	DailyList dailylist;
+	//DailyList dailylist;
 	StockList stocklist;
 	private  final long alarm_interval = 24*60*60*1000;  //24 hour
 	
-	private DailyGoodStockScanTask lastLookup;   
+	private DailyStockScanTask lastLookup;   
 	private KudnsRefreshTask lastRefresh;  
 	private final int HANDLER_FLAG_TASK_COMPLETE =  0x12345678;
 	private final int HANDLER_FLAG_WIFI_CONNECTED = 0x12345679;
@@ -63,12 +65,12 @@ public class DailyStockScanService extends ZService {
 	    alarmIntent = PendingIntent.getBroadcast(this, 0, intentToFire, 0);
 	    
 	    
-	    myBroadcastReceiver = new NetworkConnectChangedReceiver();
+/*	    myBroadcastReceiver = new NetworkConnectChangedReceiver();
 	    IntentFilter filter = new IntentFilter();
 	    filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
 	    filter.addAction(WifiManager.WIFI_STATE_CHANGED_ACTION);
 	    filter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
-	    this.registerReceiver(myBroadcastReceiver, filter);
+	    this.registerReceiver(myBroadcastReceiver, filter);*/
 	    
 	    LocalBroadcastManager.getInstance(this).registerReceiver(mWifiStatusReceiver,
 	    	      new IntentFilter(NetworkConnectChangedReceiver.ACTION_WIFI_CONNECTED));
@@ -94,7 +96,7 @@ public class DailyStockScanService extends ZService {
 		super.onDestroy();
 		Log.e(TAG, "onDestroy");
 		
-		this.unregisterReceiver(myBroadcastReceiver);
+/*		this.unregisterReceiver(myBroadcastReceiver);*/
 		
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(mWifiStatusReceiver);
 	}
@@ -109,11 +111,12 @@ public class DailyStockScanService extends ZService {
 	    alarms.setRepeating(alarmType, timeToRefresh, alarm_interval, alarmIntent);  
 	    
 	    //alarms.cancel(alarmIntent);
-	    dailylist = StockListHelper.getInstance().getDailyList();
-	    
-		DailyGoodStockScan(dailylist.getlastScanID());
+	    //dailylist = StockListHelper.getInstance().getDailyList();
+		stocklist = StockListHelper.getInstance().getStockList();
 		
-		stocklist = StockListHelper.getInstance().getList();
+		DailyStockScan(stocklist.getlastScanID());
+		
+
 
 		return Service.START_NOT_STICKY;
 	}
@@ -124,7 +127,7 @@ public class DailyStockScanService extends ZService {
 		switch(msg.what){
 		case HANDLER_FLAG_TASK_COMPLETE:
 			Log.e(TAG, "handle task complete, stopSelf");
-			this.stopSelf();
+			//this.stopSelf();
 			break;
 			
 		case HANDLER_FLAG_WIFI_CONNECTED:
@@ -134,8 +137,9 @@ public class DailyStockScanService extends ZService {
 			Log.e(TAG, "handle wifi connected, refreshVersionCheck");
 /*			Intent startIntent = new Intent(this, DailyStockScanService.class);
 		    this.startService(startIntent);*/
-			dailylist = StockListHelper.getInstance().getDailyList();
-			DailyGoodStockScan(dailylist.getlastScanID());
+			//dailylist = StockListHelper.getInstance().getDailyList();
+			stocklist = StockListHelper.getInstance().getStockList();
+			DailyStockScan(stocklist.getlastScanID());
 			
 			//refreshKudns_com();
 		    break;
@@ -143,15 +147,23 @@ public class DailyStockScanService extends ZService {
 		return false;
 	}
 	
-	public void DailyGoodStockScan(String stockID) {
+/*	public void DailyGoodStockScan(String stockID) {
 	    if (lastLookup==null ||
 	    		lastLookup.getStatus().equals(AsyncTask.Status.FINISHED)) {
 	      lastLookup = new DailyGoodStockScanTask(handler);
 	      lastLookup.execute(stockID);
 
 	    }
-	}
+	}*/
 	
+	public void DailyStockScan(String stockID) {
+	    if (lastLookup==null ||
+	    		lastLookup.getStatus().equals(AsyncTask.Status.FINISHED)) {
+	      lastLookup = new DailyStockScanTask(handler);
+	      lastLookup.execute(stockID);
+
+	    }
+	}
 	
 	public void refreshKudns_com() {
 	    if (lastRefresh==null ||
@@ -226,13 +238,17 @@ public class DailyStockScanService extends ZService {
 		@Override
 		protected String doInBackground(String... params) {
 			// TODO Auto-generated method stub
+			if(System.currentTimeMillis() - stocklist.getlastScanTime()<24*60*60*1000){
+				return null;
+			}
+			
 			String lastStockID = params[0];
-			StockList stocklist = StockListHelper.getInstance().getList();
+			StockList stocklist = StockListHelper.getInstance().getStockList();
 			boolean reset = true;
 			if(lastStockID!=null){
 				reset = !stocklist.seekTo(lastStockID);
 			}
-			
+	
 			String stockID = stocklist.generateStockID(reset);
 			do{
 				Log.e(TAG, "lastStockID:" + lastStockID);
@@ -259,8 +275,19 @@ public class DailyStockScanService extends ZService {
 					update = true;
 					completeID = stock.id;
 					
-					//save stock into internal storage
-					StockListHelper.getInstance().persistStock(stock);
+					//对比laststock和这个stock是否有变化
+					Stock lastStock = StockListHelper.getInstance().getLastStock(stock.id);
+					
+					if(StockListHelper.isChangeStock(lastStock, stock)){
+						//save stock into history stocks
+						String today_str = DateUtils.dateToString(new Date(), "yyyyMMdd");
+						StockListHelper.getInstance().persistHistoryStock(today_str, stock);
+						
+						//save stock into internal storage
+						StockListHelper.getInstance().persistLastStock(stock);
+					}
+					
+
 				}
 				
 			}while(stockID!=null);
@@ -272,10 +299,10 @@ public class DailyStockScanService extends ZService {
 			if(update){
 				if(!isAbort){
 					//完成这次扫描(中途被终止的不算)，记录时间
-					dailylist.setlastScanTime(System.currentTimeMillis());
+					stocklist.setlastScanTime(System.currentTimeMillis());
 				}
-				Log.e(TAG, "persistDailyList!");
-				StockListHelper.getInstance().persistDailyList(dailylist);
+				Log.e(TAG, "persistStockList!");
+				StockListHelper.getInstance().persistStockList(stocklist);
 			}
 
 			
@@ -298,7 +325,7 @@ public class DailyStockScanService extends ZService {
 	 * 
 	 *  @author zhangwei
 	 * */
-	private class DailyGoodStockScanTask extends AsyncTask<String,Void,String>{
+/*	private class DailyGoodStockScanTask extends AsyncTask<String,Void,String>{
 
 		private Handler handler;
 		private boolean update;
@@ -364,7 +391,7 @@ public class DailyStockScanService extends ZService {
 					completeID = stock.id;
 					
 					//save stock into internal storage
-					StockListHelper.getInstance().persistStock(stock);
+					StockListHelper.getInstance().persistLastStock(stock);
 				}
 
 			}
@@ -391,5 +418,5 @@ public class DailyStockScanService extends ZService {
 				handler.sendEmptyMessage(HANDLER_FLAG_TASK_COMPLETE);
 			}
 		}  
-	}
+	}*/
 }

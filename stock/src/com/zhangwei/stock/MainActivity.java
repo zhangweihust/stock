@@ -11,7 +11,7 @@ import org.jsoup.select.Elements;
 
 import cn.zipper.framwork.core.ZActivity;
 
-import com.zhangwei.stock.common.storage.StorageManager;
+import com.zhangwei.stock.common.storage.SDCardStorageManager;
 import com.zhangwei.stock.gson.DailyList;
 import com.zhangwei.stock.gson.Stock;
 import com.zhangwei.stock.gson.StockList;
@@ -50,20 +50,21 @@ public class MainActivity extends ZActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		
-		Intent intent=new Intent(MainActivity.this, DailyStockScanService.class);  
-		//@@@@ startService(intent);
+		//Intent intent=new Intent(MainActivity.this, DailyStockScanService.class);  
+		//startService(intent);
+		SDCardStorageManager.getInstance();//.testAPI();
 		
-		TencentStockHelper.getInstance().fetch_ycgz(new Stock("sh600315"));
+		//TencentStockHelper.getInstance().fetch_ycgz(new Stock("sh600315"));
 		
-/*		sl = StockListHelper.getInstance().getList();
-		stock_t = new StockTask();
-*/
+		//sl = StockListHelper.getInstance().getList();
+		//stock_t = new StockTask();
+
 		//解析sina历史交易记录
 		//show_history_trade();
 
 		//解析腾讯股票医生
-		// --- String next = sl.generateStockID(false);
-		// ---- stock_t.execute(next);
+		//String next = sl.generateStockID(false);
+		//stock_t.execute(next);
 
 		//获取股票列表
 		//sl = new StockList();
@@ -154,7 +155,7 @@ public class MainActivity extends ZActivity {
 			Stock stock = new Stock(stockID, stockname.text(), rank.attr("class"), 
 					                info.text(), descrp.text(), trend.text(),  trend_detail.text(),
 					                quality.text(), quality_detail.text());
-			StorageManager.getInstance(this).putItem(stockID, stock, Stock.class);
+			SDCardStorageManager.getInstance().putItem(null, stockID, stock, Stock.class);
 
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -200,7 +201,7 @@ public class MainActivity extends ZActivity {
 			stock_t = new StockTask();
 			String next = sl.generateStockID(false);
 			Log.e("handleMesage", "process:" + next);
-			stock_t.execute(next);
+			//stock_t.execute(next);
 			break;
 		}
 		return false;

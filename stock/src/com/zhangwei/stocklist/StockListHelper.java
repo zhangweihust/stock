@@ -8,7 +8,7 @@ import android.content.res.AssetManager;
 import cn.zipper.framwork.core.ZApplication;
 
 import com.google.gson.Gson;
-import com.zhangwei.stock.common.storage.StorageManager;
+import com.zhangwei.stock.common.storage.SDCardStorageManager;
 import com.zhangwei.stock.gson.DailyList;
 import com.zhangwei.stock.gson.Stock;
 import com.zhangwei.stock.gson.StockList;
@@ -36,14 +36,15 @@ public class StockListHelper {
 		return ins;
 	}
 	
-	public StockList getList(){
+	public StockList getStockList(){
 		//1. from memory
 		if(stocklist!=null){
 			return stocklist;
 		}
 		
 		//2. from internal storage
-		stocklist = (StockList) StorageManager.getInstance(null).getItem(StockList.ID, StockList.class);
+		stocklist = (StockList) SDCardStorageManager.getInstance()
+				                              .getItem(context.getFilesDir().getPath(), StockList.ID, StockList.class);
 		if(stocklist!=null){
 			return stocklist;
 		}
@@ -76,7 +77,8 @@ public class StockListHelper {
 
 		//save to internal storage
 		if(stocklist!=null){
-			StorageManager.getInstance(null).putItem(StockList.ID, stocklist, StockList.class);
+			SDCardStorageManager.getInstance()
+			              .putItem(context.getFilesDir().getPath(), StockList.ID, stocklist, StockList.class);
 		}
 
 	}
@@ -89,7 +91,8 @@ public class StockListHelper {
 		}
 		
 		//2. from internal storage
-		dailylist = (DailyList) StorageManager.getInstance(null).getItem(DailyList.ID, DailyList.class);
+		dailylist = (DailyList) SDCardStorageManager.getInstance()
+				                              .getItem(context.getFilesDir().getPath(), DailyList.ID, DailyList.class);
 		if(dailylist!=null){
 			return dailylist;
 		}
@@ -133,17 +136,48 @@ public class StockListHelper {
 
 		//save to internal storage
 		if(stock!=null){
-			StorageManager.getInstance(null).putItem("last", stock.id, stock, Stock.class);
+			SDCardStorageManager.getInstance()
+			              .putItem(context.getFilesDir() + "/last", stock.id, stock, Stock.class);
 		}
 
+	}
+	
+	public Stock getLastStock(String stockid){
+		return (Stock) SDCardStorageManager.getInstance()
+				                     .getItem("last", stockid, Stock.class);
 	}
 	
 	public void persistHistoryStock(String date, Stock stock){
 
 		//save to internal storage
 		if(stock!=null){
-			StorageManager.getInstance(null).putItem("history/" + date, stock.id, stock, Stock.class);
+			SDCardStorageManager.getInstance()
+			              .putItem(context.getFilesDir() + "/history/" + stock.id, date, stock, Stock.class);
 		}
 
+	}
+	
+	/**
+	 *  比较两个stock是否改变
+	 *  true 改变
+	 *  false 未改变
+	 * */
+	public static boolean isChangeStock(Stock left, Stock right){
+		if(left==null || right==null){
+			return true;
+		}
+		
+		boolean change = false;
+		if(!left.rank.equals(right.rank)){
+			change = true;
+		}else if(!left.info.equals(right.info)){
+			change = true;
+		}else if(!left.trend.equals(right.trend)){
+			change = true;
+		}else if(!left.quality.equals(right.quality)){
+			change = true;
+		}
+		
+		return change;
 	}
 }

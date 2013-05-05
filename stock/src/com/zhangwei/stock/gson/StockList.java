@@ -29,6 +29,8 @@ public class StockList {
 		shenzheng_list = new ArrayList<String>();
 		chuangye_list = new ArrayList<String>();
 		index = 0;
+		lastScanTime = 0;
+		lastScanID = null;
 	}
 	
 	public boolean seekTo(String stockID){
