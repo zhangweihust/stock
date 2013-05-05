@@ -1,4 +1,4 @@
-package com.zhangwei.stock.common.storage;
+package com.zhangwei.stock.storage;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -17,6 +17,8 @@ import java.util.Map.Entry;
 import cn.zipper.framwork.core.ZApplication;
 
 import com.google.gson.Gson;
+import com.zhangwei.stock.utils.ZipUtil;
+
 import android.content.Context;
 import android.os.Environment;
 import android.util.Log;
@@ -123,6 +125,8 @@ public class SDCardStorageManager {
 				}
 
 				mInput.close();
+				
+				//return ZipUtil.uncompress(sb.toString());
 				return sb.toString();
 
 			} catch (FileNotFoundException e) {
@@ -138,10 +142,13 @@ public class SDCardStorageManager {
 	}
 
 	/**
+	 * @param dir 在外存储的目录的路径（不含sdcard路径， 上层一般使用包名加多级目录构成）
+	 * @param file 文件名
+	 * @param cls 类型
 	 * @return 被Cache的元数据信息
 	 */
-	public Object getItem(String path, String uri, Class<?> cls) {
-		String jsonStr = getItem(path, uri);
+	public Object getItem(String dir, String file, Class<?> cls) {
+		String jsonStr = getItem(dir, file);
 		Object object = null;
 		try{
 			if (jsonStr != null) {
@@ -215,6 +222,8 @@ public class SDCardStorageManager {
 
 
 			mOutput = new FileOutputStream(dataFile, false);
+			
+			//mOutput.write(ZipUtil.compress(objStr).getBytes());
 			mOutput.write(objStr.getBytes());
 			mOutput.close();
 	

@@ -1,4 +1,4 @@
-package com.zhangwei.stock.common.utils;
+package com.zhangwei.stock.utils;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

@@ -11,12 +11,12 @@ import org.jsoup.select.Elements;
 
 import cn.zipper.framwork.core.ZActivity;
 
-import com.zhangwei.stock.common.storage.SDCardStorageManager;
 import com.zhangwei.stock.gson.DailyList;
 import com.zhangwei.stock.gson.Stock;
 import com.zhangwei.stock.gson.StockList;
 import com.zhangwei.stock.net.TencentStockHelper;
 import com.zhangwei.stock.service.DailyStockScanService;
+import com.zhangwei.stock.storage.SDCardStorageManager;
 import com.zhangwei.stocklist.StockListHelper;
 
 
@@ -50,9 +50,9 @@ public class MainActivity extends ZActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		
-		//Intent intent=new Intent(MainActivity.this, DailyStockScanService.class);  
-		//startService(intent);
-		SDCardStorageManager.getInstance();//.testAPI();
+		Intent intent=new Intent(MainActivity.this, DailyStockScanService.class);  
+		startService(intent);
+		
 		
 		//TencentStockHelper.getInstance().fetch_ycgz(new Stock("sh600315"));
 		

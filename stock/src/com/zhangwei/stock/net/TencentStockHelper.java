@@ -17,9 +17,9 @@ import org.jsoup.select.Elements;
 
 import android.util.Log;
 
-import com.zhangwei.stock.common.utils.Constants;
-import com.zhangwei.stock.common.utils.InputCheck;
 import com.zhangwei.stock.gson.Stock;
+import com.zhangwei.stock.utils.Constants;
+import com.zhangwei.stock.utils.InputCheck;
 
 public class TencentStockHelper {
 	private static TencentStockHelper ins;
@@ -105,12 +105,12 @@ public class TencentStockHelper {
 					result_info, result_descrp, result_trend,  result_trend_detail,
 					result_quality, result_quality_detail);
 			
-/*			if(fetch_ycgz(stock)){
+			if(fetch_ycgz(stock)){
 				Date now = new Date();
 				DateFormat df = DateFormat.getDateInstance();
 				stock.scan_date = df.format(now);
 				Log.e("test", "stock.scan_date:" + stock.scan_date);
-			}*/
+			}
 			
 
 			return stock;
@@ -134,39 +134,42 @@ public class TencentStockHelper {
 		try {
 			doc = Jsoup.connect(connect_url).timeout(30000).get();
 
-			Element values = doc.body().select("div.zdig").first().select("div").first().child(0);//("div.title");
 			
-			Double max = 0.0;
-			Double min = 999999999.0;
-			for(TextNode tn : values.textNodes()){
-				if(InputCheck.checkNum(tn.text().trim())){
-					//Log.e("stock qujian", tn.text());
-					Double temp = -1.0;
-					try{
-						temp = Double.valueOf(tn.text().trim());
-					}catch(NumberFormatException ex){
+			if(doc.body().select("div.zdig").first().select("div").first().children().size()>0){
+				Element values = doc.body().select("div.zdig").first().select("div").first().child(0);//("div.title");
+				Double max = 0.0;
+				Double min = 999999999.0;
+				for(TextNode tn : values.textNodes()){
+					if(InputCheck.checkNum(tn.text().trim())){
+						//Log.e("stock qujian", tn.text());
+						Double temp = -1.0;
+						try{
+							temp = Double.valueOf(tn.text().trim());
+						}catch(NumberFormatException ex){
+							
+						}
 						
+						if(temp>0 && max<temp){
+							max = temp;
+						}
+						if(temp>0 && min>temp){
+							min = temp;
+						}
 					}
 					
-					if(temp>0 && max<temp){
-						max = temp;
-					}
-					if(temp>0 && min>temp){
-						min = temp;
-					}
+				}
+				DecimalFormat df = new DecimalFormat(".##");
+				if(max>0.0){
+					stock.stockEstimateHighValue = df.format(max);
+					Log.e("stockEstimateHighValue", stock.stockEstimateHighValue );
 				}
 				
+				if(min<999999999.0){
+					stock.stockEstimateLowValue = df.format(min);;
+					Log.e("stockEstimateLowValue", stock.stockEstimateLowValue );
+				}
 			}
-			DecimalFormat df = new DecimalFormat(".##");
-			if(max>0.0){
-				stock.stockEstimateHighValue = df.format(max);
-				Log.e("stockEstimateHighValue", stock.stockEstimateHighValue );
-			}
-			
-			if(min<999999999.0){
-				stock.stockEstimateLowValue = df.format(min);;
-				Log.e("stockEstimateLowValue", stock.stockEstimateLowValue );
-			}
+
 			
 			
 			for(Element elem:doc.body().select("td.gray_bottom_solid")){
@@ -267,84 +270,4 @@ public class TencentStockHelper {
 		
 	}
 	
-	public boolean fetch_ycgz(String  stock){
-		//http://stockhtm.finance.qq.com/sstock/quotpage/q/600315.htm#ycgz
-		//http://img.gtimg.cn/copage/ycgz/htm/600315.htm
-		
-		Document doc = null;
-		String id = Pattern.compile("[a-zA-Z]").matcher(stock).replaceAll("");
-		String connect_url = ycgz_url_prefix + id + ".htm";
-		Log.e("test", "fetch_ycgz connect_url:" + connect_url);
-		try {
-			doc = Jsoup.connect(connect_url).timeout(30000).get();
-
-			Element values = doc.body().select("div.zdig").first().select("div").first().child(0);//("div.title");
-			for(TextNode tn : values.textNodes()){
-				if(InputCheck.checkNum(tn.text().trim())){
-					//Log.e("stock qujian", tn.text());
-				}
-				
-			}
-			
-			for(Element elem:doc.body().select("td.gray_bottom_solid")){
-				int type_state=0;
-				for(Element sec_elem: elem.select("tbody").first().select("td")){
-					Element strong_elem = sec_elem.select("strong").first();
-					if(strong_elem!=null){
-						String strong_str = strong_elem.text().replaceAll("[:： ]", "");
-						if(Constants.stockQuality.equals(strong_str)){
-							type_state = 1;
-							Log.e("quality", strong_str);
-						}else if(Constants.stockIncrement.equals(strong_str)){
-							type_state = 2;
-							Log.e("stockIncrement", strong_str);
-						}else if(Constants.stockSafe.equals(strong_str)){
-							type_state = 3;
-							Log.e("stockSafe", strong_str);
-						}else if(Constants.stockMarketValue.equals(strong_str)){
-							type_state = 4;
-							Log.e("stockMarketValue", strong_str);
-						}else if(Constants.stockAssetValue.equals(strong_str)){
-							type_state = 5;
-							Log.e("stockAssetValue", strong_str);
-						}else if(Constants.stockReturnValue.equals(strong_str)){
-							type_state = 6;
-							Log.e("stockReturnValue", strong_str);
-						}
-					}else{
-						Log.e("detail", type_state + " " + sec_elem.text());
-						type_state = 0;
-					} 
-					
-				}
-			}
-			
-			for( Element elem2 : doc.body().select("td")){
-				Element strong_elem = elem2.select("strong").first();
-				if(strong_elem!=null && elem2.select("td").size()==1){
-					String strong_str = strong_elem.text().replaceAll("[:： ]", "");
-					if(Constants.stockValueSize.equals(strong_str)){
-						//Log.e("stockValueSize",elem2.parent().html());
-						for(Element elem3:elem2.parent().select("span")){
-							Log.e("elem3",elem3.html());
-						}
-						
-					}
-				}
-				
-
-			}
-
-
-			
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return false;
-		}
-		
-		
-		return true;
-		
-	}
 }

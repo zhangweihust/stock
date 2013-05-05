@@ -7,7 +7,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import com.zhangwei.stock.common.utils.DateUtils;
 import com.zhangwei.stock.gson.DailyList;
 import com.zhangwei.stock.gson.GoodStock;
 import com.zhangwei.stock.gson.Stock;
@@ -16,6 +15,7 @@ import com.zhangwei.stock.net.TencentStockHelper;
 import com.zhangwei.stock.net.WifiHelper;
 import com.zhangwei.stock.receiver.DailyReceiver;
 import com.zhangwei.stock.receiver.NetworkConnectChangedReceiver;
+import com.zhangwei.stock.utils.DateUtils;
 import com.zhangwei.stocklist.StockListHelper;
 
 import android.app.AlarmManager;
@@ -65,12 +65,12 @@ public class DailyStockScanService extends ZService {
 	    alarmIntent = PendingIntent.getBroadcast(this, 0, intentToFire, 0);
 	    
 	    
-/*	    myBroadcastReceiver = new NetworkConnectChangedReceiver();
+	    myBroadcastReceiver = new NetworkConnectChangedReceiver();
 	    IntentFilter filter = new IntentFilter();
 	    filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
 	    filter.addAction(WifiManager.WIFI_STATE_CHANGED_ACTION);
 	    filter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
-	    this.registerReceiver(myBroadcastReceiver, filter);*/
+	    this.registerReceiver(myBroadcastReceiver, filter);
 	    
 	    LocalBroadcastManager.getInstance(this).registerReceiver(mWifiStatusReceiver,
 	    	      new IntentFilter(NetworkConnectChangedReceiver.ACTION_WIFI_CONNECTED));
@@ -115,7 +115,8 @@ public class DailyStockScanService extends ZService {
 		stocklist = StockListHelper.getInstance().getStockList();
 		
 		DailyStockScan(stocklist.getlastScanID());
-		
+		//stocklist.seekTo("sh600055");
+		//DailyStockScan(stocklist.generateStockID(false));
 
 
 		return Service.START_NOT_STICKY;
@@ -239,6 +240,7 @@ public class DailyStockScanService extends ZService {
 		protected String doInBackground(String... params) {
 			// TODO Auto-generated method stub
 			if(System.currentTimeMillis() - stocklist.getlastScanTime()<24*60*60*1000){
+				Log.e(TAG, "curtime:" + System.currentTimeMillis() + " lastScanTime:" + stocklist.getlastScanTime());
 				return null;
 			}
 			
@@ -248,9 +250,14 @@ public class DailyStockScanService extends ZService {
 			if(lastStockID!=null){
 				reset = !stocklist.seekTo(lastStockID);
 			}
+			
+			if(reset){
+				stocklist.reset();
+			}
 	
-			String stockID = stocklist.generateStockID(reset);
+			String stockID = null;//stocklist.generateStockID(reset);
 			do{
+				stockID = stocklist.generateStockID(false);
 				Log.e(TAG, "lastStockID:" + lastStockID);
 
 				//check net, only wifi can run
@@ -269,9 +276,9 @@ public class DailyStockScanService extends ZService {
 				Stock stock = TencentStockHelper.getInstance().get_stock_from_tencent(stockID);
 				if(stock!=null){
 					Log.e(TAG, "a stock done,  stock.id:" + stock.id);
-					
+					lastStockID = stock.id;
 					//实时记录扫描的id到dailyList中
-					stocklist.setlastScanID(stock.id);
+					stocklist.setlastScanID(lastStockID);
 					update = true;
 					completeID = stock.id;
 					
@@ -280,8 +287,8 @@ public class DailyStockScanService extends ZService {
 					
 					if(StockListHelper.isChangeStock(lastStock, stock)){
 						//save stock into history stocks
-						String today_str = DateUtils.dateToString(new Date(), "yyyyMMdd");
-						StockListHelper.getInstance().persistHistoryStock(today_str, stock);
+						
+						StockListHelper.getInstance().persistHistoryStock(stock);
 						
 						//save stock into internal storage
 						StockListHelper.getInstance().persistLastStock(stock);

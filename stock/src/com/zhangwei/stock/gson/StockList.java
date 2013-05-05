@@ -49,6 +49,10 @@ public class StockList {
 		return found;
 	}
 	
+	public void reset(){
+		index=0;
+	}
+	
 	public String generateStockID(boolean reset){
 		String ret = null;
 		int sh_size = shangzheng_list.size();

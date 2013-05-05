@@ -2,16 +2,18 @@ package com.zhangwei.stocklist;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Date;
 
 import android.content.Context;
 import android.content.res.AssetManager;
 import cn.zipper.framwork.core.ZApplication;
 
 import com.google.gson.Gson;
-import com.zhangwei.stock.common.storage.SDCardStorageManager;
 import com.zhangwei.stock.gson.DailyList;
 import com.zhangwei.stock.gson.Stock;
 import com.zhangwei.stock.gson.StockList;
+import com.zhangwei.stock.storage.SDCardStorageManager;
+import com.zhangwei.stock.utils.DateUtils;
 
 public class StockListHelper {
 
@@ -44,7 +46,7 @@ public class StockListHelper {
 		
 		//2. from internal storage
 		stocklist = (StockList) SDCardStorageManager.getInstance()
-				                              .getItem(context.getFilesDir().getPath(), StockList.ID, StockList.class);
+				                              .getItem(null, StockList.ID, StockList.class);
 		if(stocklist!=null){
 			return stocklist;
 		}
@@ -78,7 +80,7 @@ public class StockListHelper {
 		//save to internal storage
 		if(stocklist!=null){
 			SDCardStorageManager.getInstance()
-			              .putItem(context.getFilesDir().getPath(), StockList.ID, stocklist, StockList.class);
+			              .putItem(null, StockList.ID, stocklist, StockList.class);
 		}
 
 	}
@@ -92,7 +94,7 @@ public class StockListHelper {
 		
 		//2. from internal storage
 		dailylist = (DailyList) SDCardStorageManager.getInstance()
-				                              .getItem(context.getFilesDir().getPath(), DailyList.ID, DailyList.class);
+				                              .getItem(null, DailyList.ID, DailyList.class);
 		if(dailylist!=null){
 			return dailylist;
 		}
@@ -137,7 +139,7 @@ public class StockListHelper {
 		//save to internal storage
 		if(stock!=null){
 			SDCardStorageManager.getInstance()
-			              .putItem(context.getFilesDir() + "/last", stock.id, stock, Stock.class);
+			              .putItem("last", stock.id, stock, Stock.class);
 		}
 
 	}
@@ -147,12 +149,12 @@ public class StockListHelper {
 				                     .getItem("last", stockid, Stock.class);
 	}
 	
-	public void persistHistoryStock(String date, Stock stock){
-
+	public void persistHistoryStock(Stock stock){
+		String date = DateUtils.dateToString(new Date(), "yyyyMMdd");
 		//save to internal storage
 		if(stock!=null){
 			SDCardStorageManager.getInstance()
-			              .putItem(context.getFilesDir() + "/history/" + stock.id, date, stock, Stock.class);
+			              .putItem("history/" + stock.id, date, stock, Stock.class);
 		}
 
 	}

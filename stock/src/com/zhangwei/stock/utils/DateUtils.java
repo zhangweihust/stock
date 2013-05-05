@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.zhangwei.stock.common.utils;
+package com.zhangwei.stock.utils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
