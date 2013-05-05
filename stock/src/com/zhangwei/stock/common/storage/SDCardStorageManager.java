@@ -209,8 +209,8 @@ public class SDCardStorageManager {
 			//Create the file reference
 /*			File dataFile = new File(parentPath, file);*/
 			File dataFile= new File(app_data_dir + "/"  + key);
-			if(!dataFile.exists()) {
-				dataFile.mkdirs();
+			if(!dataFile.getParentFile().exists()) {
+				dataFile.getParentFile().mkdirs();
 			}
 
 
@@ -263,7 +263,13 @@ public class SDCardStorageManager {
 		//String key = MD5.encode(CHACHE_PREFIX, uri.getBytes());
 		if (cache.containsKey(key)) {
 			cache.remove(key);
-			context.deleteFile(key);
+			//context.deleteFile(key);
+			File dataFile= new File(app_data_dir + "/"  + key);
+			if(dataFile.isFile()){
+				dataFile.delete();
+			}
+
+			
 		}
 	}
 
@@ -275,7 +281,11 @@ public class SDCardStorageManager {
 			Map.Entry<String, StorageValue> entry = (Map.Entry<String, StorageValue>) iter
 					.next();
 			String key = entry.getKey();
-			context.deleteFile(key);
+			//context.deleteFile(key);
+			File dataFile= new File(app_data_dir + "/"  + key);
+			if(dataFile.isFile()){
+				dataFile.delete();
+			}
 		}
 
 		cache.clear();
