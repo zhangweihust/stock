@@ -1,5 +1,9 @@
 package com.zhangwei.stock.receiver;
 
+
+
+import com.zhangwei.stock.service.DailyStockScanService;
+
 import android.content.Context;
 import android.content.Intent;
 import android.net.NetworkInfo;
@@ -29,11 +33,10 @@ public class NetworkConnectChangedReceiver extends ZBroadcastReceiver {
 				State state = networkInfo.getState();
 				boolean isConnected = state == State.CONNECTED;// 当然，这边可以更精确的确定状态
 				if (isConnected) {
-					Intent intent_to_send = new Intent(ACTION_WIFI_CONNECTED);
-					// You can also include some extra data.
-					//intent_to_send.putExtra("message", "This is my message!");
+/*					Intent intent_to_send = new Intent(ACTION_WIFI_CONNECTED);
 					Log.e("NetworkConnectChangedReceiver", "onReceive send ACTION_WIFI_CONNECTED" );
-					LocalBroadcastManager.getInstance(context).sendBroadcast(intent_to_send);
+					LocalBroadcastManager.getInstance(context).sendBroadcast(intent_to_send);*/
+					context.startService(new Intent(context, DailyStockScanService.class));
 					
 					
 

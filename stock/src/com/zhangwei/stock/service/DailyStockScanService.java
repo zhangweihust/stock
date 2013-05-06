@@ -65,15 +65,15 @@ public class DailyStockScanService extends ZService {
 	    alarmIntent = PendingIntent.getBroadcast(this, 0, intentToFire, 0);
 	    
 	    
-	    myBroadcastReceiver = new NetworkConnectChangedReceiver();
+/*	    myBroadcastReceiver = new NetworkConnectChangedReceiver();
 	    IntentFilter filter = new IntentFilter();
 	    filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
 	    filter.addAction(WifiManager.WIFI_STATE_CHANGED_ACTION);
 	    filter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
-	    this.registerReceiver(myBroadcastReceiver, filter);
+	    this.registerReceiver(myBroadcastReceiver, filter);*/
 	    
-	    LocalBroadcastManager.getInstance(this).registerReceiver(mWifiStatusReceiver,
-	    	      new IntentFilter(NetworkConnectChangedReceiver.ACTION_WIFI_CONNECTED));
+/*	    LocalBroadcastManager.getInstance(this).registerReceiver(mWifiStatusReceiver,
+	    	      new IntentFilter(NetworkConnectChangedReceiver.ACTION_WIFI_CONNECTED));*/
 
 	}
 	
@@ -98,7 +98,7 @@ public class DailyStockScanService extends ZService {
 		
 /*		this.unregisterReceiver(myBroadcastReceiver);*/
 		
-		LocalBroadcastManager.getInstance(this).unregisterReceiver(mWifiStatusReceiver);
+/*		LocalBroadcastManager.getInstance(this).unregisterReceiver(mWifiStatusReceiver);*/
 	}
 	
 	
@@ -128,7 +128,7 @@ public class DailyStockScanService extends ZService {
 		switch(msg.what){
 		case HANDLER_FLAG_TASK_COMPLETE:
 			Log.e(TAG, "handle task complete, stopSelf");
-			//this.stopSelf();
+			this.stopSelf();
 			break;
 			
 		case HANDLER_FLAG_WIFI_CONNECTED:
