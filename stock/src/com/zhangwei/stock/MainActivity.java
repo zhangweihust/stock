@@ -54,7 +54,9 @@ public class MainActivity extends ZActivity {
 		Intent intent=new Intent(MainActivity.this, DailyStockScanService.class);  
 		//startService(intent);
 		
-		new JsoupHelper().test();
+		//new JsoupHelper().test();
+		Stock stock = new Stock("sh600315");
+		TencentStockHelper.getInstance().fetch_ycgz(stock);
 		
 		
 		//TencentStockHelper.getInstance().fetch_ycgz(new Stock("sh600315"));

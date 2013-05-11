@@ -3,6 +3,7 @@ package com.zhangwei.stock.net;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -131,12 +132,16 @@ public class TencentStockHelper {
 		String id = Pattern.compile("[a-zA-Z]").matcher(stock.id).replaceAll("");
 		String connect_url = ycgz_url_prefix + id + ".htm";
 		Log.e("test", "fetch_ycgz connect_url:" + connect_url);
+		
+		JsoupHelper jh = new JsoupHelper();
 		try {
 			doc = Jsoup.connect(connect_url).timeout(30000).get();
 
-			
-			if(doc.body().select("div.zdig").first().select("div").first().children().size()>0){
-				Element values = doc.body().select("div.zdig").first().select("div").first().child(0);//("div.title");
+			Element values =  jh.search(doc.body(), "div.zdig/div" , "0/1");
+			if(values!=null){
+				//Element values = doc.body().select("div.zdig").first().select("div").first().child(0);//("div.title");
+				//jh.dump(doc.body(), "div.zdig_div" );
+				
 				Double max = 0.0;
 				Double min = 999999999.0;
 				for(TextNode tn : values.textNodes()){
@@ -171,8 +176,97 @@ public class TencentStockHelper {
 			}
 
 			
+			//ArrayList<Element> result_descrp = jh.dump(doc.body(), "td.gray_bottom_solid/tbody/td/strong" );
+			//ArrayList<Element> result_descrp = jh.dump(doc.body(), "td.gray_bottom_solid/tbody/td");
 			
-			for(Element elem:doc.body().select("td.gray_bottom_solid")){
+			//公司品质
+			Element stockQualityElement = jh.search(doc.body(), "td.gray_bottom_solid/tbody/td", "0/0/1");
+			String[] stockQualityTexts = jh.getTextFromElement(stockQualityElement);
+			if(stockQualityTexts!=null && stockQualityTexts.length>0){
+				stock.stockQuality = stockQualityTexts[0].replaceAll("[:： ]", "");
+				Log.e(TAG, Constants.stockQuality + " :" + stock.stockQuality);
+				
+				
+				Element stockSafeDetailElement = jh.search(doc.body(), "td.gray_bottom_solid/tbody/td", "0/0/2");
+				if(stockSafeDetailElement!=null){
+					stock.stockQuality_detail = stockSafeDetailElement.text();
+					Log.e(TAG, Constants.stockQuality + "细节 :" + stock.stockQuality_detail);
+				}
+				
+			}
+			
+			//增长速度
+			Element stockIncrementElement = jh.search(doc.body(), "td.gray_bottom_solid/tbody/td", "0/0/3");
+			String[] stockIncrementTexts = jh.getTextFromElement(stockIncrementElement);
+			if(stockIncrementTexts!=null && stockIncrementTexts.length>0){
+				stock.stockIncrement = stockIncrementTexts[0].replaceAll("[:： ]", "");
+				Log.e(TAG, Constants.stockIncrement + " :" + stock.stockIncrement);
+				
+				Element stockIncrementDetailElement = jh.search(doc.body(), "td.gray_bottom_solid/tbody/td", "0/0/4");
+				if(stockIncrementDetailElement!=null){
+					stock.stockIncrement_detail = stockIncrementDetailElement.text();
+					Log.e(TAG, Constants.stockIncrement + "细节 :" + stock.stockIncrement_detail);
+				}
+			}
+			
+			//资本安全
+			Element stockSafeElement = jh.search(doc.body(), "td.gray_bottom_solid/tbody/td", "0/0/5");
+			String[] stockSafeTexts = jh.getTextFromElement(stockSafeElement);
+			if(stockSafeTexts!=null && stockSafeTexts.length>0){
+				stock.stockSafe = stockSafeTexts[0].replaceAll("[:： ]", "");
+				Log.e(TAG, Constants.stockSafe + " :" + stock.stockSafe);
+
+				Element stockSafeDetailElement = jh.search(doc.body(), "td.gray_bottom_solid/tbody/td", "0/0/6");
+				if(stockSafeDetailElement!=null){
+					stock.stockSafe_detail = stockSafeDetailElement.text();
+					Log.e(TAG, Constants.stockSafe + "细节 :" + stock.stockSafe_detail);
+				}
+			}
+			
+			//市场价值
+			Element stockMarketValueElement = jh.search(doc.body(), "td.gray_bottom_solid/tbody/td", "1/0/1");
+			String[] stockMarketValueTexts = jh.getTextFromElement(stockMarketValueElement);
+			if(stockQualityTexts!=null && stockMarketValueTexts.length>0){
+				stock.stockMarketValue = stockMarketValueTexts[0].replaceAll("[:： ]", "");
+				Log.e(TAG, Constants.stockMarketValue + " :" + stock.stockMarketValue);
+				
+				Element stockMarketValueDetailElement = jh.search(doc.body(), "td.gray_bottom_solid/tbody/td", "1/0/2");
+				if(stockMarketValueDetailElement!=null){
+					stock.stockMarketValue_detail = stockMarketValueDetailElement.text();
+					Log.e(TAG, Constants.stockMarketValue + "细节 :" + stock.stockMarketValue_detail);
+				}
+			}
+			
+			//资产价值
+			Element stockAssetValueTextsElement = jh.search(doc.body(), "td.gray_bottom_solid/tbody/td", "1/0/3");
+			String[] stockAssetValueTexts = jh.getTextFromElement(stockAssetValueTextsElement);
+			if(stockAssetValueTexts!=null && stockAssetValueTexts.length>0){
+				stock.stockAssetValue = stockAssetValueTexts[0].replaceAll("[:： ]", "");
+				Log.e(TAG, Constants.stockAssetValue + " :" + stock.stockAssetValue);
+				
+				Element stockAssetValueDetailElement = jh.search(doc.body(), "td.gray_bottom_solid/tbody/td", "1/0/4");
+				if(stockAssetValueDetailElement!=null){
+					stock.stockAssetValue_detail = stockAssetValueDetailElement.text();
+					Log.e(TAG, Constants.stockAssetValue + "细节 :" + stock.stockAssetValue_detail);
+				}
+			}
+			
+			
+			//收益价值
+			Element stockReturnValueTextsElement = jh.search(doc.body(), "td.gray_bottom_solid/tbody/td", "1/0/5");
+			String[] stockReturnValueTexts = jh.getTextFromElement(stockReturnValueTextsElement);
+			if(stockReturnValueTexts!=null && stockReturnValueTexts.length>0){
+				stock.stockReturnValue = stockReturnValueTexts[0].replaceAll("[:： ]", "");
+				Log.e(TAG, Constants.stockReturnValue + " :" + stock.stockReturnValue);
+				
+				Element stockReturnValueElement = jh.search(doc.body(), "td.gray_bottom_solid/tbody/td", "1/0/6");
+				if(stockReturnValueElement!=null){
+					stock.stockReturnValue_detail = stockReturnValueElement.text();
+					Log.e(TAG, Constants.stockReturnValue + "细节 :" + stock.stockReturnValue_detail);
+				}
+			}
+			
+/*			for(Element elem:doc.body().select("td.gray_bottom_solid")){
 				int type_state=0;
 				for(Element sec_elem: elem.select("tbody").first().select("td")){
 					Element strong_elem = sec_elem.select("strong").first();
@@ -222,8 +316,21 @@ public class TencentStockHelper {
 					} 
 					
 				}
-			}
+			}*/
 			
+			//ArrayList<Element> result_descrp = jh.dump(doc.body(), "table.table1/tbody/tr/td/table/tbody/tr/td/span");
+			//化工行业
+			Element hanye = jh.search(doc.body(), "table.table1/tbody/tr/td/table/tbody/tr/td/span", "0/0/8/0/0/0/0/2/0");
+		    if(hanye!=null && hanye.text()!=null && hanye.text().contains("行业")){
+		    	stock.Category = hanye.text();
+		    }
+		    
+			//化工行业
+/*			Element hanye = jh.search(doc.body(), "table.table1/tbody/tr/td/table/tbody/tr/td/span", "0/0/8/0/0/0/0/2/0");
+		    if(hanye!=null && hanye.text()!=null && hanye.text().contains("行业")){
+		    	stock.Category = hanye.text().text();
+		    }
+			*/
 			for( Element elem2 : doc.body().select("td")){
 				Element strong_elem = elem2.select("strong").first();
 				if(strong_elem!=null && elem2.select("td").size()==1){
