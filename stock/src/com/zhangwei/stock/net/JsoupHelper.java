@@ -116,8 +116,14 @@ public class JsoupHelper {
 	private Elements match(Element input, String[] cssQuerys, String[] indexs, int level){
 		
 		int index = 0;
-		if(indexs.length>level){
-			index = Integer.valueOf(indexs[level]);
+		
+		if(indexs!=null && indexs.length>level){
+			try{
+				index = Integer.valueOf(indexs[level]);
+			}catch(Exception e){
+				e.printStackTrace();
+			}
+
 		}		
 
 		if(input!=null){	
@@ -191,34 +197,5 @@ public class JsoupHelper {
 		return sb.toString();
 	}
 	
-	
-	public   void test(){
-		String connect_url = "http://img.gtimg.cn/copage/ycgz/htm/600315.htm";
-		try {
-			String cssQuery = "div/div/span";
-			Document doc = Jsoup.connect(connect_url).timeout(30000).get();
-			
-			Element e =  search(doc.body(), cssQuery, "3/1/2");
-			if(e!=null){
-				Log.e("JsoupHelper", e.html());
-			}else{
-				Log.e("JsoupHelper", "null");
-			}
-			
-			String[] result = getTextFromElement(e);
-			if(result!=null){
-				for(String r:result){
-					Log.w(TAG, "r:" + r);
-				}
-			}
 
-			
-			dump(doc.body(), cssQuery);
-
-			
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
 }

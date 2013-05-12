@@ -59,45 +59,6 @@ public class MainActivity extends ZActivity {
 		TencentStockHelper.getInstance().fetch_ycgz(stock);
 		
 		
-		//TencentStockHelper.getInstance().fetch_ycgz(new Stock("sh600315"));
-		
-		//sl = StockListHelper.getInstance().getList();
-		//stock_t = new StockTask();
-
-		//解析sina历史交易记录
-		//show_history_trade();
-
-		//解析腾讯股票医生
-		//String next = sl.generateStockID(false);
-		//stock_t.execute(next);
-
-		//获取股票列表
-		//sl = new StockList();
-		//save_stock_list(stock_list_sh, 0);
-		//save_stock_list(stock_list_sz, 1);
-		//save_stock_list(stock_list_cyb, 2);
-
-/*		DailyList dlist = StockListHelper.getInstance().getDailyList();
-		//获取质地优秀股票列表
-		StockList sl = StockListHelper.getInstance().getList();
-		String next = sl.generateStockID(true);
-		do{
-			Log.d(TAG, "next " + next);
-			Stock s = (Stock) StorageManager.getInstance(null).getItem(next, Stock.class);
-			if(s!=null){
-				Log.e("ddddd", s.quality);
-				if("优秀".equals(s.quality)){
-					Log.e(TAG, "优秀 " + next);
-					dlist.updateStock(s.id, s.rank, s.trend, s.quality);
-				}
-			}
-
-			
-			next = sl.generateStockID(false);
-		}while(next!=null);
-
-		StockListHelper.getInstance().persistDailyList(dlist);*/
-		
 		Log.e("jsoup", "Ok done");
 	}
 	
