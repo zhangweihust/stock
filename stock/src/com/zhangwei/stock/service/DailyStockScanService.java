@@ -294,8 +294,11 @@ public class DailyStockScanService extends ZService {
 						StockListHelper.getInstance().persistLastStock(stock);
 					}
 					
+					StockListHelper.getInstance().persistStockList(stocklist);
 
 				}
+				
+
 				
 			}while(stockID!=null);
 

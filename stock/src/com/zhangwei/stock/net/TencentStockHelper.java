@@ -160,6 +160,11 @@ public class TencentStockHelper {
 		//http://img.gtimg.cn/copage/ycgz/htm/600315.htm
 		
 		Document doc = null;
+		
+		if(stock==null || stock.id==null){
+			return false;
+		}
+		
 		String id = Pattern.compile("[a-zA-Z]").matcher(stock.id).replaceAll("");
 		String connect_url = ycgz_url_prefix + id + ".htm";
 		Log.e("test", "fetch_ycgz connect_url:" + connect_url);
