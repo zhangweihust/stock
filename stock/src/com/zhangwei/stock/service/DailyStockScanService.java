@@ -261,7 +261,7 @@ public class DailyStockScanService extends ZService {
 				Log.e(TAG, "lastStockID:" + lastStockID);
 
 				//check net, only wifi can run
-				if(!WifiHelper.VALUE_WIFI.equals(WifiHelper.getNetType())){
+				if(!(WifiHelper.VALUE_WIFI.equals(WifiHelper.getNetType())||WifiHelper.VALUE_3G.equals(WifiHelper.getNetType()))){
 					Log.e(TAG, "WifiHelper,  status:" + WifiHelper.getNetType() + " stockID" + stockID);
 					isAbort = true;
 					break;

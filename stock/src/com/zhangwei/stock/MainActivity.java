@@ -52,12 +52,13 @@ public class MainActivity extends ZActivity {
 		setContentView(R.layout.activity_main);
 		
 		Intent intent=new Intent(MainActivity.this, DailyStockScanService.class);  
-		//startService(intent);
+		startService(intent);
 		
 		//new JsoupHelper().test();
-		Stock stock = new Stock("sh600315");
-		TencentStockHelper.getInstance().fetch_ycgz(stock);
+		//Stock stock = new Stock("sh600315");
+		//TencentStockHelper.getInstance().fetch_ycgz(stock);
 		
+		//TencentStockHelper.getInstance().get_stock_from_tencent("sh600315");
 		
 		Log.e("jsoup", "Ok done");
 	}

@@ -51,56 +51,85 @@ public class TencentStockHelper {
 	public Stock get_stock_from_tencent(String stockID){
 
 		try {
-			String result_stockname;
-			String result_rank;
-			String result_info;
-			String result_descrp;
-			String result_trend;
-			String result_trend_detail;
-			String result_quality;
-			String result_quality_detail;
+			String result_stockname = null;
+			String result_rank = null;
+			String result_info = null;
+			String result_descrp = null;
+			String result_trend = null;
+			String result_trend_detail = null;
+			String result_quality = null;
+			String result_quality_detail = null;
 			
 			Document doc = null;
 			String connect_url = doctor_url_prefix + stockID + ".html";
 			doc = Jsoup.connect(connect_url).timeout(30000).get();
+			JsoupHelper jh = new JsoupHelper();
 			
 			//rank
 			Element lefttd = doc.body().getElementById("lefttd");
-			Element rank = lefttd.select("div").first();
-			result_rank = rank.attr("class");
+			if(lefttd!=null){
+				//Element rank = lefttd.select("div").first();
+				Element rank =  jh.search(lefttd, "div" , "0");
+				if(rank!=null){
+					result_rank = rank.attr("class");
+				}
+
+			}
+
 			//Log.e("ok", "rank:" + rank.attr("class"));
 			
 			Element qt_ctn1 = doc.body().getElementById("qt-ctn1");
-			Element stockname = qt_ctn1.select("span.dh_name").first();
-			result_stockname = stockname.text();
+			if(qt_ctn1!=null){
+				//Element stockname = qt_ctn1.select("span.dh_name").first();
+				Element stockname =  jh.search(qt_ctn1, "span.dh_name" , "0");
+				if(stockname!=null){
+					result_stockname = stockname.text();
+				}
+
+			}
+
 			//Log.e("ok", "stockname : " + stockname.text()); //
 
 			Element righttd = doc.body().getElementById("righttd");
-			Element info = righttd.select("div.text-head").first();
+			if(righttd!=null){
+				//Element info = righttd.select("div.text-head").first();
+				Element info =  jh.search(righttd, "div.text-head" , "0");
+				if(info!=null){
+					result_info = info.text();
+				}
+			}
+
 			Element descrp = righttd.getElementById("doctor_h2desp");
-			result_info = info.text();
-			result_descrp = descrp.text();
-/*			Log.e("ok", "info:" + info.text());
-			Log.e("ok", "descrp : " + descrp.text());*/
+			if(descrp!=null){
+				result_descrp = descrp.text();
+			}
+
 			
 			Element boxb = doc.body().getElementById("boxb");
-			Element icon01 = boxb.select("div.icon01").first();
-			Element trend = icon01.select("span").first();
-			result_trend = trend.text();
-			//Log.e("ok", "trend : " + trend.text()); // 较强 , trend
-			
-			Element trend_detail = boxb.select("div.data1").first();
-			result_trend_detail = trend_detail.text();
-			//Log.e("ok", "trend_detail:" + trend_detail.text());
-			
-			Element icon02 = boxb.select("div.icon02").first();
-			Element quality = icon02.select("span").first();
-			result_quality = quality.text();
-			//Log.e("ok", "quality : " + quality.text()); // 较强 , trend
-			
-			Element quality_detail = boxb.select("div.data2").first();
-			result_quality_detail = quality_detail.text();
-			//Log.e("ok", "trend_detail:" + quality_detail.text());
+			if(boxb!=null){
+				Element trend =  jh.search(boxb, "div.icon01/span" , "0/0");
+				if(trend!=null){
+					result_trend = trend.text();
+				}
+				
+				Element trend_detail = jh.search(boxb, "div.data1", "0");
+				if(trend_detail!=null){
+					result_trend_detail = trend_detail.text();
+				}
+				
+				
+				Element quality = jh.search(boxb, "div.icon02/span", "0/0");
+				if(quality!=null){
+					result_quality = quality.text();
+				}
+				
+				Element quality_detail =  jh.search(boxb, "div.data2", "0");
+				if(quality_detail!=null){
+					result_quality_detail = quality_detail.text();
+				}
+
+			}
+
 			
 			Stock stock = new Stock(stockID, result_stockname, result_rank, 
 					result_info, result_descrp, result_trend,  result_trend_detail,
