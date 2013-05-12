@@ -296,26 +296,32 @@ public class TencentStockHelper {
 			}
 		    
 		    Elements es2 = jh.match(doc.body(), "table.table1/tbody/tr/td/table/tbody/tr/td/span", "0/0/8/0/0/0/0/2");
-		    for(Element e:es2){
-				if(e.text()!=null && e.text().contains("股")){
-					stock.Size = e.text();
-				}else if(e.text()!=null && e.text().contains("元")){
-					stock.MarketValue = e.text();
-				}else if(e.text()!=null && e.text().contains("行业")){
-					stock.Category = e.text();
-				}else {
-					//stock.Category = e.text();
-				}
+		    if(es2!=null){
+			    for(Element e:es2){
+					if(e.text()!=null && e.text().contains("股")){
+						stock.Size = e.text();
+					}else if(e.text()!=null && e.text().contains("元")){
+						stock.MarketValue = e.text();
+					}else if(e.text()!=null && e.text().contains("行业")){
+						stock.Category = e.text();
+					}else {
+						//stock.Category = e.text();
+					}
+			    }
 		    }
+
 		    
 		    Elements es3 = jh.match(doc.body(), "span.logo", "0");
-			for(Element elem :es3){
-				
-				if(elem.text()!=null && elem.text().contains("更新")){
-					Log.e("logo", elem.text());
-					stock.YC_Time = elem.text();
-				}
-			}
+		    if(es3!=null){
+				for(Element elem :es3){
+					
+					if(elem.text()!=null && elem.text().contains("更新")){
+						Log.e("logo", elem.text());
+						stock.YC_Time = elem.text();
+					}
+				}	
+		    }
+
 
 
 			
