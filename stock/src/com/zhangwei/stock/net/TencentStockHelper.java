@@ -97,12 +97,14 @@ public class TencentStockHelper {
 				if(info!=null){
 					result_info = info.text();
 				}
+				
+				Element descrp = righttd.getElementById("doctor_h2desp");
+				if(descrp!=null){
+					result_descrp = descrp.text();
+				}
 			}
 
-			Element descrp = righttd.getElementById("doctor_h2desp");
-			if(descrp!=null){
-				result_descrp = descrp.text();
-			}
+
 
 			
 			Element boxb = doc.body().getElementById("boxb");
