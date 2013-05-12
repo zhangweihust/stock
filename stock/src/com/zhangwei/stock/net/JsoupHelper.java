@@ -53,8 +53,8 @@ public class JsoupHelper {
 
 	/**
 	 *  @param input 在给定的Element中搜索cssQuerys
-	 *  @param cssQuerys cssQuerys数组
-	 *  @param index 对应cssQuerys每个cssQuery查询的元素位置 
+	 *  @param cssQuery_str_array cssQuerys数组
+	 *  @param indexs_str_array 对应cssQuerys每个cssQuery查询的元素位置 
 	 * */
 	public   Element search(Element input,  String[] cssQuery_str_array, String[] indexs_str_array){
 
@@ -102,7 +102,7 @@ public class JsoupHelper {
 	/**
 	 *  @param input 在给定的Element中搜索cssQuerys
 	 *  @param cssQuerys cssQuerys数组
-	 *  @param index 对应cssQuerys每个cssQuery查询的元素位置 
+	 *  @param indexs 对应cssQuerys每个cssQuery查询的元素位置 
 	 *  @return pipeiElements
 	 * */
 	public Elements match(Element input,  String cssQuerys, String indexs){
@@ -118,31 +118,22 @@ public class JsoupHelper {
 		int index = 0;
 		if(indexs.length>level){
 			index = Integer.valueOf(indexs[level]);
+		}		
+
+		if(input!=null){	
+			if(level+1<cssQuerys.length){
+				Elements es = input.select(cssQuerys[level]);
+				
+				if(es!=null && es.size()>index){					
+					return match(es.get(index), cssQuerys, indexs, level+1);
+				}
+			}else{
+				Elements es2 = input.select(cssQuerys[level]);
+				return es2;
+			}
 		}
 		
-
-		if(input!=null){
-			Elements es = input.select(cssQuerys[level]);
-			
-			if(level<indexs.length){
-				if(es.size()>index){
-					Elements result = null;
-					Element e = es.get(index);
-					if(e!=null){
-						result = match(e, cssQuerys, indexs, level+1);
-					}
-					
-					return result;
-				}
-				
-				return null;
-			}else{
-				return es;
-			}
-		}else{
-			return null;
-		}
-
+		return null;
 		
 	}
 	

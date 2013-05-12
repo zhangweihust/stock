@@ -265,96 +265,20 @@ public class TencentStockHelper {
 					Log.e(TAG, Constants.stockReturnValue + "细节 :" + stock.stockReturnValue_detail);
 				}
 			}
-			
-/*			for(Element elem:doc.body().select("td.gray_bottom_solid")){
-				int type_state=0;
-				for(Element sec_elem: elem.select("tbody").first().select("td")){
-					Element strong_elem = sec_elem.select("strong").first();
-					if(strong_elem!=null){
-						String strong_str = strong_elem.text().replaceAll("[:： ]", "");
-						if(Constants.stockQuality.equals(strong_str)){
-							type_state = 1;
-							stock.stockQuality = sec_elem.textNodes().get(0).text().replaceAll("[:： ]", "");
-							Log.e("quality", strong_str + " what:" + stock.stockQuality);
-						}else if(Constants.stockIncrement.equals(strong_str)){
-							type_state = 2;
-							stock.stockIncrement = sec_elem.textNodes().get(0).text().replaceAll("[:： ]", "");
-							Log.e("stockIncrement", strong_str + " what:" + stock.stockIncrement);
-						}else if(Constants.stockSafe.equals(strong_str)){
-							type_state = 3;
-							stock.stockSafe = sec_elem.textNodes().get(0).text().replaceAll("[:： ]", "");
-							Log.e("stockSafe", strong_str + " what:" + stock.stockSafe);
-						}else if(Constants.stockMarketValue.equals(strong_str)){
-							type_state = 4;
-							stock.stockMarketValue = sec_elem.textNodes().get(0).text().replaceAll("[:： ]", "");
-							Log.e("stockMarketValue", strong_str + " what:" + stock.stockMarketValue);
-						}else if(Constants.stockAssetValue.equals(strong_str)){
-							type_state = 5;
-							stock.stockAssetValue = sec_elem.textNodes().get(0).text().replaceAll("[:： ]", "");
-							Log.e("stockAssetValue", strong_str + " what:" + stock.stockAssetValue);
-						}else if(Constants.stockReturnValue.equals(strong_str)){
-							type_state = 6;
-							stock.stockReturnValue = sec_elem.textNodes().get(0).text().replaceAll("[:： ]", "");
-							Log.e("stockReturnValue", strong_str + " what:" + stock.stockReturnValue);
-						}
-					}else{
-						Log.e("detail", type_state + " " + sec_elem.text());
-						if(type_state==1){
-							stock.stockQuality_detail = sec_elem.text();
-						}else if(type_state==2){
-							stock.stockIncrement_detail = sec_elem.text();
-						}else if(type_state==3){
-							stock.stockSafe_detail = sec_elem.text();
-						}else if(type_state==4){
-							stock.stockMarketValue_detail = sec_elem.text();
-						}else if(type_state==5){
-							stock.stockAssetValue_detail = sec_elem.text();
-						}else if(type_state==6){
-							stock.stockReturnValue_detail = sec_elem.text();
-						}
-						type_state = 0;
-					} 
-					
+		    
+		    Elements es2 = jh.match(doc.body(), "table.table1/tbody/tr/td/table/tbody/tr/td/span", "0/0/8/0/0/0/0/2");
+		    for(Element e:es2){
+				if(e.text().contains("股")){
+					stock.Size = e.text();
+				}else if(e.text().contains("元")){
+					stock.MarketValue = e.text();
+				}else if(e.text().contains("行业")){
+					stock.Category = e.text();
+				}else {
+					//stock.Category = e.text();
 				}
-			}*/
-			
-			//ArrayList<Element> result_descrp = jh.dump(doc.body(), "table.table1/tbody/tr/td/table/tbody/tr/td/span");
-			//化工行业
-			Element hanye = jh.search(doc.body(), "table.table1/tbody/tr/td/table/tbody/tr/td/span", "0/0/8/0/0/0/0/2/0");
-		    if(hanye!=null && hanye.text()!=null && hanye.text().contains("行业")){
-		    	stock.Category = hanye.text();
 		    }
 		    
-			//化工行业
-/*			Element hanye = jh.search(doc.body(), "table.table1/tbody/tr/td/table/tbody/tr/td/span", "0/0/8/0/0/0/0/2/0");
-		    if(hanye!=null && hanye.text()!=null && hanye.text().contains("行业")){
-		    	stock.Category = hanye.text().text();
-		    }
-			*/
-			for( Element elem2 : doc.body().select("td")){
-				Element strong_elem = elem2.select("strong").first();
-				if(strong_elem!=null && elem2.select("td").size()==1){
-					String strong_str = strong_elem.text().replaceAll("[:： ]", "");
-					if(Constants.stockValueSize.equals(strong_str)){
-						//Log.e("stockValueSize",elem2.parent().html());
-						for(Element elem3:elem2.parent().select("span")){
-							Log.e("elem3",elem3.html());
-							if(elem3.text().contains("股")){
-								stock.Size = elem3.text();
-							}else if(elem3.text().contains("元")){
-								stock.MarketValue = elem3.text();
-							}else if(elem3.text().contains("行业")){
-								stock.Category = elem3.text();
-							}else {
-								stock.Category = elem3.text();
-							}
-						}
-						
-					}
-				}
-				
-
-			}
 			
 			for(Element elem : doc.body().select("span.logo")){
 				
