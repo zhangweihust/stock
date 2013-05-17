@@ -12,6 +12,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.http.util.ByteArrayBuffer;
+
 
 
 import cn.zipper.framwork.core.ZApplication;
@@ -118,16 +120,17 @@ public class SDCardStorageManager {
 				//FileInputStream mInput = context.openFileInput(key);
 				int len = 0;
 				byte[] data = new byte[1024];
-				StringBuilder sb = new StringBuilder();
 
+				ByteArrayBuffer ba = new ByteArrayBuffer(1024);
+				
 				while ((len = mInput.read(data)) != -1) {
-					sb.append(new String(data, 0, len));
+					ba.append(data, 0, len);
 				}
 
 				mInput.close();
 				
 				//return ZipUtil.uncompress(sb.toString());
-				return sb.toString();
+				return new String(ba.toByteArray());
 
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
