@@ -126,7 +126,7 @@ public class DailyStockScanService extends ZService {
 		//DailyStockScan(stocklist.generateStockID(false));
 
 
-		return Service.START_NOT_STICKY;
+		return Service.START_STICKY;
 	}
 	
 	private void showNotify(String title, String content){
