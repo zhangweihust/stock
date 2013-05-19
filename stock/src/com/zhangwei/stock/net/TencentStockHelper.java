@@ -44,6 +44,22 @@ public class TencentStockHelper {
 		return ins;
 	}
 	
+	public boolean judgeNetwork(){
+		boolean result = false;
+		try{
+			Document doc = null;
+			doc = Jsoup.connect("http://www.baidu.com").timeout(30000).get();
+			if(doc!=null){
+				result = true;
+			}
+
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		
+		return result;
+	}
+	
 	/**
 	 * 
 	 *  从腾讯doctor获取信息，再从腾讯英策估值中完善信息
@@ -150,6 +166,7 @@ public class TencentStockHelper {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			
 			return null;
 		}
 

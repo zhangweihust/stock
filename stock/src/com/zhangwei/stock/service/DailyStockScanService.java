@@ -1,12 +1,15 @@
 package com.zhangwei.stock.service;
 
 
+import java.text.DateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import com.zhangwei.stock.MainActivity;
+import com.zhangwei.stock.R;
 import com.zhangwei.stock.gson.DailyList;
 import com.zhangwei.stock.gson.GoodStock;
 import com.zhangwei.stock.gson.Stock;
@@ -19,6 +22,8 @@ import com.zhangwei.stock.utils.DateUtils;
 import com.zhangwei.stocklist.StockListHelper;
 
 import android.app.AlarmManager;
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
@@ -31,6 +36,8 @@ import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import cn.zipper.framwork.io.network.ZHttp2;
@@ -121,6 +128,34 @@ public class DailyStockScanService extends ZService {
 
 		return Service.START_NOT_STICKY;
 	}
+	
+	private void showNotify(String title, String content){
+		int mId = 0x12345678;
+		NotificationCompat.Builder mBuilder =
+		        new NotificationCompat.Builder(this)
+		        .setSmallIcon(R.drawable.ic_launcher)
+		        .setContentTitle(title)
+		        .setContentText(content)
+		        .setAutoCancel(true);
+		
+		Intent resultIntent = new Intent(this, MainActivity.class);
+		resultIntent.setFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+		
+		TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+		stackBuilder.addParentStack(MainActivity.class);
+		
+		// Adds the Intent that starts the Activity to the top of the stack
+		stackBuilder.addNextIntent(resultIntent);
+		PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT  );
+		mBuilder.setContentIntent(resultPendingIntent);
+		NotificationManager mNotificationManager =
+		    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+		// mId allows you to update the notification later on.
+		Notification notification = mBuilder.getNotification();
+		notification.tickerText = title;
+		notification.defaults =  Notification.DEFAULT_SOUND | Notification.FLAG_AUTO_CANCEL;
+		mNotificationManager.notify(mId, notification);
+	}
 
 	@Override
 	public boolean handleMessage(Message msg) {
@@ -128,6 +163,8 @@ public class DailyStockScanService extends ZService {
 		switch(msg.what){
 		case HANDLER_FLAG_TASK_COMPLETE:
 			Log.e(TAG, "handle task complete, stopSelf");
+			String now = DateFormat.getDateInstance().format(new Date());
+			showNotify("扫描完成", now);
 			this.stopSelf();
 			break;
 			
@@ -239,8 +276,10 @@ public class DailyStockScanService extends ZService {
 		@Override
 		protected String doInBackground(String... params) {
 			// TODO Auto-generated method stub
-			if(System.currentTimeMillis() - stocklist.getlastScanTime()<24*60*60*1000){
-				Log.e(TAG, "curtime:" + System.currentTimeMillis() + " lastScanTime:" + stocklist.getlastScanTime());
+			Date lastscan_day = new Date(stocklist.getlastScanTime());
+			Date now_day = new Date();
+			if(DateUtils.compareDay(lastscan_day, now_day)==0){
+				Log.e(TAG,"last scan time is the same day of the today, ingore");
 				return null;
 			}
 			
@@ -256,9 +295,43 @@ public class DailyStockScanService extends ZService {
 			}
 	
 			String stockID = null;//stocklist.generateStockID(reset);
+			int errCount = 0; //连续出错计数
+			int retry = 0; //重试计数
 			do{
-				stockID = stocklist.generateStockID(false);
-				Log.e(TAG, "lastStockID:" + lastStockID);
+				Log.e(TAG, " stockID" + stockID + " errCount:" + errCount + " retry:" + retry);
+				if(errCount<1){
+					stockID = stocklist.generateStockID(false);
+					try {
+						Thread.sleep(1000);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}else{
+					if(TencentStockHelper.getInstance().judgeNetwork()){
+						Log.e(TAG, "www.baidu.com is ok");
+						//网络可用情况下，如果重试超过3次，则说明目的端有问题，取下一个
+						if(retry>3){
+							retry=0;
+							errCount = 0;
+							continue;
+						}
+
+						retry++;
+
+					}else{
+						Log.e(TAG, "www.baidu.com not connected");
+						//没有网络就一直连接百度看是否能连上
+						try {
+							Thread.sleep(10000);
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+				}
+
+				Log.e(TAG, "lastStockID:" + lastStockID + " stockID:" + stockID);
 
 				//check net, only wifi can run
 				if(!(WifiHelper.VALUE_WIFI.equals(WifiHelper.getNetType())||WifiHelper.VALUE_3G.equals(WifiHelper.getNetType()))){
@@ -295,7 +368,10 @@ public class DailyStockScanService extends ZService {
 					}
 					
 					StockListHelper.getInstance().persistStockList(stocklist);
+					errCount = 0;
 
+				}else{
+					errCount++;
 				}
 				
 

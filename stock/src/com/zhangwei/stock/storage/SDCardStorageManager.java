@@ -22,6 +22,7 @@ import com.google.gson.Gson;
 import com.zhangwei.stock.utils.ZipUtil;
 
 import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Environment;
 import android.util.Log;
 
@@ -72,9 +73,12 @@ public class SDCardStorageManager {
 				String key = f.getAbsolutePath()
 						      .substring(app_data_dir.length()+1);
 				Log.e(TAG, "cache.put key:" + key);
-				cache.put(key, new StorageValue(key, (int) f.length()));
+				synchronized (cache) {
+					cache.put(key, new StorageValue(key, (int) f.length()));
+				}
+
 			}else if(f.isDirectory()){
-				load(f.getPath()) ; 
+				//load(f.getPath()) ; 
 			}
 			
 		}
@@ -106,8 +110,14 @@ public class SDCardStorageManager {
 		}else{
 			key = CHACHE_PREFIX + file;
 		}
+		
+		boolean exist = false;
+		synchronized (cache) {
+			exist = cache.containsKey(key);
+		}
 
-		if (cache.containsKey(key)) {
+
+		if (exist) {
 			// Read the created file and display to the screen
 			try {
 
@@ -218,6 +228,11 @@ public class SDCardStorageManager {
 
 			//Create the file reference
 /*			File dataFile = new File(parentPath, file);*/
+			File appDataPath = new File(Environment.getExternalStorageDirectory(), storage_dir_in_sdcard);
+			app_data_dir = appDataPath.getAbsolutePath();
+			if(!appDataPath.exists()) {
+				appDataPath.mkdirs();
+			}
 			File dataFile= new File(app_data_dir + "/"  + key);
 			if(!dataFile.getParentFile().exists()) {
 				dataFile.getParentFile().mkdirs();
@@ -229,8 +244,10 @@ public class SDCardStorageManager {
 			//mOutput.write(ZipUtil.compress(objStr).getBytes());
 			mOutput.write(objStr.getBytes());
 			mOutput.close();
-	
-			result = cache.put(key, new StorageValue(key, objStr.getBytes().length));
+			synchronized (cache) {
+				result = cache.put(key, new StorageValue(key, objStr.getBytes().length));	
+			}
+
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -303,5 +320,15 @@ public class SDCardStorageManager {
 		cache.clear();
 
 	}
+	
+/*	private class LoadTask extends AsyncTask<String , Void ,Void>{
+
+		@Override
+		protected Void doInBackground(String... params) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+		
+	}*/
 
 }

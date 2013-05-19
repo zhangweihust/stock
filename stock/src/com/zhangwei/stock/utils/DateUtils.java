@@ -5,6 +5,7 @@ package com.zhangwei.stock.utils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -47,6 +48,28 @@ public class DateUtils {
 		if(dDate.getTime()>=start.getTime()&&dDate.getTime()<=end.getTime())
 			return true;
 		return false;
+	}
+	
+	public static int  compareDay(Date d1,Date d2){
+        Calendar c1 = Calendar.getInstance();  
+        Calendar c2 = Calendar.getInstance();  
+        c1.setTime(d1);  
+        c2.setTime(d2);  
+        
+        if((c1.get(Calendar.YEAR) - c2.get(Calendar.YEAR))!=0){
+        	return (c1.get(Calendar.YEAR) - c2.get(Calendar.YEAR));
+        }
+        
+        if((c1.get(Calendar.MONTH) - c2.get(Calendar.MONTH)) !=0){
+        	return (c1.get(Calendar.MONTH) - c2.get(Calendar.MONTH));
+        }
+        
+        if((c1.get(Calendar.DAY_OF_MONTH) - c2.get(Calendar.DAY_OF_MONTH)) !=0){
+        	return (c1.get(Calendar.DAY_OF_MONTH) - c2.get(Calendar.DAY_OF_MONTH));
+        }
+        
+
+        return 0;
 	}
 	
 }
