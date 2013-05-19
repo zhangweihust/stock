@@ -158,6 +158,8 @@ public class TencentStockHelper {
 				DateFormat df = DateFormat.getDateInstance();
 				stock.scan_date = df.format(now);
 				Log.e("test", "stock.scan_date:" + stock.scan_date);
+			}else{
+				return null;
 			}
 			
 
