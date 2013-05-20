@@ -396,7 +396,7 @@ public class DailyStockScanService extends ZService {
 		}
 		
 		protected void onPostExecute(String result) {  
-			if(!isAbort){
+			if(!isAbort && completeID!=null){
 				//Message msg = handler.obtainMessage(HANDLER_FLAG_TASK_COMPLETE);
 				//msg.sendToTarget();
 				handler.sendEmptyMessage(HANDLER_FLAG_TASK_COMPLETE);
