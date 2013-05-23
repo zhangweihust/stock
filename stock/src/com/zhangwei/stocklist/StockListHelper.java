@@ -178,6 +178,8 @@ public class StockListHelper {
 			change = true;
 		}else if(!left.quality.equals(right.quality)){
 			change = true;
+		}else if(!left.YC_Time.equals(right.YC_Time)){
+			change = true;
 		}
 		
 		return change;
