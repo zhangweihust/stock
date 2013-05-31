@@ -78,7 +78,7 @@ public class StockList {
 			//index++;
 		}else{
 			//no-op
-			lastScanID = "tail";
+			lastScanID = TAIL;
 		}
 	}
 	

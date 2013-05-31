@@ -338,6 +338,9 @@ public class DailyStockScanService extends ZService {
 					break;
 				}
 				
+/*				stocklist.next();
+				stocklist.setlastScanTime(System.currentTimeMillis());*/
+				
 				Stock stock = TencentStockHelper.getInstance().get_stock_from_tencent(curScanStockID);
 				if(stock!=null){
 					Log.e(TAG, "a stock done,  stock.id:" + stock.id);
@@ -347,6 +350,7 @@ public class DailyStockScanService extends ZService {
 					update = true;
 					completeID = stock.id;
 					stocklist.next();
+					stocklist.setlastScanTime(System.currentTimeMillis());
 					errCount = 0;
 					
 					//对比laststock和这个stock是否有变化
@@ -394,105 +398,5 @@ public class DailyStockScanService extends ZService {
 		}  
 	}
 
-	/**
-	 * 
-	 *  @param 输入 上次记录的stock: sh600031(上次已完成)
-	 *  @param 输出 这次完成的stock： sh600032
-	 * 
-	 *  @author zhangwei
-	 * */
-/*	private class DailyGoodStockScanTask extends AsyncTask<String,Void,String>{
 
-		private Handler handler;
-		private boolean update;
-		private boolean findIndex;
-		private boolean isAbort;
-		private String completeID;
-		
-		public DailyGoodStockScanTask(Handler handler) {
-			// TODO Auto-generated constructor stub
-			this.handler = handler;
-			update = false;
-			findIndex = false;
-			isAbort = false;
-			completeID = null;
-		}
-
-		@Override
-		protected String doInBackground(String... params) {
-			// TODO Auto-generated method stub
-			String lastStockID = params[0];
-			DailyList dailylist = StockListHelper.getInstance().getDailyList();
-
-			//for(String key: dailylist.getDailyList().keySet()){
-			for(Iterator<GoodStock> iterator = dailylist.getDailyMap().values().iterator(); iterator.hasNext(); ){
-				GoodStock gs =  iterator.next(); 
-				
-				//check
-				if(gs==null || gs.id==null){
-					continue;
-				}
-				
-				if(lastStockID!=null && !findIndex){
-					//should find index first
-					if(lastStockID.equals(gs.id)){
-						findIndex = true;
-					}
-					continue;
-				}
-				
-				Log.e(TAG, "lastStockID:" + lastStockID);
-
-				//check net, only wifi can run
-				if(!WifiHelper.VALUE_WIFI.equals(WifiHelper.getNetType())){
-					Log.e(TAG, "WifiHelper,  status:" + WifiHelper.getNetType() + " gs" + gs.id);
-					isAbort = true;
-					break;
-				}
-				
-				if(isCancelled()){
-					Log.e(TAG, "isCancelled, gs:" + gs.id);
-					isAbort = true;
-					break;
-				}
-				
-				Stock stock = TencentStockHelper.getInstance().get_stock_from_tencent(gs.id);
-				if(stock!=null){
-					Log.e(TAG, "a stock done,  stock.id:" + stock.id);
-					dailylist.updateStock(stock);
-					
-					//实时记录扫描的id到dailyList中
-					dailylist.setlastScanID(stock.id);
-					update = true;
-					completeID = stock.id;
-					
-					//save stock into internal storage
-					StockListHelper.getInstance().persistLastStock(stock);
-				}
-
-			}
-			
-			Log.e(TAG, "loop over, update:" + update + " isAbort:" + isAbort + " completeID:" + completeID);
-
-			if(update){
-				if(!isAbort){
-					//完成这次扫描(中途被终止的不算)，记录时间
-					dailylist.setlastScanTime(System.currentTimeMillis());
-				}
-				Log.e(TAG, "persistDailyList!");
-				StockListHelper.getInstance().persistDailyList(dailylist);
-			}
-
-			
-			return completeID;
-		}
-		
-		protected void onPostExecute(String result) {  
-			if(!isAbort){
-				//Message msg = handler.obtainMessage(HANDLER_FLAG_TASK_COMPLETE);
-				//msg.sendToTarget();
-				handler.sendEmptyMessage(HANDLER_FLAG_TASK_COMPLETE);
-			}
-		}  
-	}*/
 }
