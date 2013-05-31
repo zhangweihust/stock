@@ -55,6 +55,7 @@ public class DailyStockScanService extends ZService {
 	
 	private DailyStockScanTask lastLookup;   
 	private KudnsRefreshTask lastRefresh;  
+	private final int HANDLER_FLAG_TODAY_COMPLETE =  0x12345612;
 	private final int HANDLER_FLAG_TASK_COMPLETE =  0x12345678;
 	private final int HANDLER_FLAG_WIFI_CONNECTED = 0x12345679;
 	
@@ -161,6 +162,8 @@ public class DailyStockScanService extends ZService {
 	public boolean handleMessage(Message msg) {
 		// TODO Auto-generated method stub
 		switch(msg.what){
+		case HANDLER_FLAG_TODAY_COMPLETE:
+			break;
 		case HANDLER_FLAG_TASK_COMPLETE:
 			Log.e(TAG, "handle task complete, stopSelf");
 			String now = DateFormat.getDateInstance().format(new Date());
@@ -185,14 +188,6 @@ public class DailyStockScanService extends ZService {
 		return false;
 	}
 	
-/*	public void DailyGoodStockScan(String stockID) {
-	    if (lastLookup==null ||
-	    		lastLookup.getStatus().equals(AsyncTask.Status.FINISHED)) {
-	      lastLookup = new DailyGoodStockScanTask(handler);
-	      lastLookup.execute(stockID);
-
-	    }
-	}*/
 	
 	public void DailyStockScan(String stockID) {
 	    if (lastLookup==null ||
@@ -260,7 +255,6 @@ public class DailyStockScanService extends ZService {
 
 		private Handler handler;
 		private boolean update;
-		private boolean findIndex;
 		private boolean isAbort;
 		private String completeID;
 		
@@ -268,7 +262,6 @@ public class DailyStockScanService extends ZService {
 			// TODO Auto-generated constructor stub
 			this.handler = handler;
 			update = false;
-			findIndex = false;
 			isAbort = false;
 			completeID = null;
 		}
@@ -276,37 +269,35 @@ public class DailyStockScanService extends ZService {
 		@Override
 		protected String doInBackground(String... params) {
 			// TODO Auto-generated method stub
-			Date lastscan_day = new Date(stocklist.getlastScanTime());
-			Date now_day = new Date();
-			if(DateUtils.compareDay(lastscan_day, now_day)==0){
-				Log.e(TAG,"last scan time is the same day of the today, ingore");
-				return null;
-			}
-			
-			String lastStockID = params[0];
+
 			StockList stocklist = StockListHelper.getInstance().getStockList();
-			boolean reset = true;
-			if(lastStockID!=null){
-				reset = !stocklist.seekTo(lastStockID);
-			}
+			String curScanStockID = null;
 			
-			if(reset){
-				stocklist.reset();
-			}
-	
-			String stockID = null;//stocklist.generateStockID(reset);
 			int errCount = 0; //连续出错计数
 			int retry = 0; //重试计数
+			
 			do{
-				Log.e(TAG, " stockID" + stockID + " errCount:" + errCount + " retry:" + retry);
+				Log.e(TAG, " lastStockID:" + curScanStockID + " errCount:" + errCount + " retry:" + retry);
 				if(errCount<1){
-					stockID = stocklist.generateStockID(false);
-					try {
-						Thread.sleep(1000);
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+					curScanStockID = stocklist.getCurStockID();
+					Date lastscan_day = new Date(stocklist.getlastScanTime());
+					Date now_day = new Date();
+					
+					if(curScanStockID.equals(StockList.TAIL)){
+						if(DateUtils.compareDay(lastscan_day, now_day)==0){
+							Log.e(TAG,"last scan time is the same day of the today, ingore");
+							completeID = StockList.TAIL;
+							break;
+						}else{
+							//new day
+							stocklist.rewind();
+							errCount = 0;
+							retry = 0;
+							continue;
+						}
+
 					}
+					
 				}else{
 					if(TencentStockHelper.getInstance().judgeNetwork()){
 						Log.e(TAG, "www.baidu.com is ok");
@@ -314,6 +305,7 @@ public class DailyStockScanService extends ZService {
 						if(retry>3){
 							retry=0;
 							errCount = 0;
+							stocklist.next();
 							continue;
 						}
 
@@ -331,36 +323,37 @@ public class DailyStockScanService extends ZService {
 					}
 				}
 
-				Log.e(TAG, "lastStockID:" + lastStockID + " stockID:" + stockID);
-
+				Log.e(TAG, "curScanStockID:" + curScanStockID);
+				
 				//check net, only wifi can run
 				if(!(WifiHelper.VALUE_WIFI.equals(WifiHelper.getNetType())||WifiHelper.VALUE_3G.equals(WifiHelper.getNetType()))){
-					Log.e(TAG, "WifiHelper,  status:" + WifiHelper.getNetType() + " stockID" + stockID);
+					Log.e(TAG, "WifiHelper,  status:" + WifiHelper.getNetType() + " curScanStockID:" + curScanStockID);
 					isAbort = true;
 					break;
 				}
 				
 				if(isCancelled()){
-					Log.e(TAG, "isCancelled, stockID:" + stockID);
+					Log.e(TAG, "isCancelled, curScanStockID:" + curScanStockID);
 					isAbort = true;
 					break;
 				}
 				
-				Stock stock = TencentStockHelper.getInstance().get_stock_from_tencent(stockID);
+				Stock stock = TencentStockHelper.getInstance().get_stock_from_tencent(curScanStockID);
 				if(stock!=null){
 					Log.e(TAG, "a stock done,  stock.id:" + stock.id);
-					lastStockID = stock.id;
+					//lastStockID = stock.id;
 					//实时记录扫描的id到dailyList中
-					stocklist.setlastScanID(lastStockID);
+					//stocklist.setlastScanID(lastStockID);
 					update = true;
 					completeID = stock.id;
+					stocklist.next();
+					errCount = 0;
 					
 					//对比laststock和这个stock是否有变化
 					Stock lastStock = StockListHelper.getInstance().getLastStock(stock.id);
 					
 					if(StockListHelper.isChangeStock(lastStock, stock)){
-						//save stock into history stocks
-						
+						//save stock into history stocks					
 						StockListHelper.getInstance().persistHistoryStock(stock);
 						
 						//save stock into internal storage
@@ -368,7 +361,6 @@ public class DailyStockScanService extends ZService {
 					}
 					
 					StockListHelper.getInstance().persistStockList(stocklist);
-					errCount = 0;
 
 				}else{
 					errCount++;
@@ -376,7 +368,7 @@ public class DailyStockScanService extends ZService {
 				
 
 				
-			}while(stockID!=null);
+			}while(curScanStockID!=null);
 
 
 			
@@ -396,9 +388,7 @@ public class DailyStockScanService extends ZService {
 		}
 		
 		protected void onPostExecute(String result) {  
-			if(!isAbort && completeID!=null){
-				//Message msg = handler.obtainMessage(HANDLER_FLAG_TASK_COMPLETE);
-				//msg.sendToTarget();
+			if(!isAbort && completeID!=null &&  completeID.equals(StockList.TAIL)){
 				handler.sendEmptyMessage(HANDLER_FLAG_TASK_COMPLETE);
 			}
 		}  

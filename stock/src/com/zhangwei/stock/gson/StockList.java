@@ -23,60 +23,67 @@ public class StockList {
 	////////////////////////////////////////////
 
 	public transient static String ID = "_StockList_";
-	private transient static int index;
-	public StockList(){
+	private transient static int index = -1;
+	public transient static String TAIL = "tail";
+/*	public StockList(){
 		shangzheng_list = new ArrayList<String>();
 		shenzheng_list = new ArrayList<String>();
 		chuangye_list = new ArrayList<String>();
-		index = 0;
+		index = -1;
 		lastScanTime = 0;
 		lastScanID = null;
-	}
+	}*/
 	
-	public boolean seekTo(String stockID){
+	private boolean seekTo(String stockID){
 		boolean found = false;
-		if(shangzheng_list.contains(stockID)){
+		if(stockID.equals(TAIL)){
 			found = true;
-			index = shangzheng_list.indexOf(stockID);
-		}else if(shenzheng_list.contains(stockID)){
-			found = true;
-			index = shangzheng_list.indexOf(stockID) + shangzheng_list.size();
-		}else if(chuangye_list.contains(stockID)){
-			found = true;
-			index = shangzheng_list.indexOf(stockID) + shangzheng_list.size() + shenzheng_list.size();
+			index = shangzheng_list.size() + shenzheng_list.size() + chuangye_list.size();
+		}else{
+			if(shangzheng_list.contains(stockID)){
+				found = true;
+				index = shangzheng_list.indexOf(stockID);
+			}else if(shenzheng_list.contains(stockID)){
+				found = true;
+				index = shangzheng_list.indexOf(stockID) + shangzheng_list.size();
+			}else if(chuangye_list.contains(stockID)){
+				found = true;
+				index = shangzheng_list.indexOf(stockID) + shangzheng_list.size() + shenzheng_list.size();
+			}
 		}
 		
 		return found;
 	}
 	
-	public void reset(){
+	public void rewind(){
 		index=0;
+		lastScanID = null;
 	}
 	
-	public String generateStockID(boolean reset){
-		String ret = null;
+	public void next(){
+		index++;
+		
 		int sh_size = shangzheng_list.size();
 		int sz_size = shenzheng_list.size();
 		int cyb_size = chuangye_list.size();
 		
-		if(reset){
-			index=0;
-		}
-		
 		if(index<sh_size){
-			ret =  shangzheng_list.get(index);
-			index++;
+			lastScanID =  shangzheng_list.get(index);
+			//index++;
 		}else if(index<sh_size+sz_size){			
-			ret =  shenzheng_list.get(index-sh_size);
-			index++;
+			lastScanID =  shenzheng_list.get(index-sh_size);
+			//index++;
 		}else if(index<sh_size+sz_size+cyb_size){
-			ret =  chuangye_list.get(index-sh_size-sz_size);
-			index++;
+			lastScanID =  chuangye_list.get(index-sh_size-sz_size);
+			//index++;
 		}else{
 			//no-op
+			lastScanID = "tail";
 		}
-		
-		return ret;
+	}
+	
+	public String getCurStockID(){		
+		return lastScanID;
 	}
 	
 	

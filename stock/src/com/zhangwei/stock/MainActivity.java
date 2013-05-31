@@ -166,7 +166,8 @@ public class MainActivity extends ZActivity {
 		switch(msg.what){
 		case HANDLER_FLAG_STOCK_PROCESS_DONE:
 			stock_t = new StockTask();
-			String next = sl.generateStockID(false);
+			sl.next();
+			String next = sl.getCurStockID();
 			Log.e("handleMesage", "process:" + next);
 			//stock_t.execute(next);
 			break;

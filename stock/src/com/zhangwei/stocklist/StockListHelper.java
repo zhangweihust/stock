@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
 
+import org.apache.http.util.ByteArrayBuffer;
+
 import android.content.Context;
 import android.content.res.AssetManager;
 import cn.zipper.framwork.core.ZApplication;
@@ -57,16 +59,26 @@ public class StockListHelper {
 		try {
 			InputStream mInput = manager.open("stock_list");
 			// myData.txt can't be more than 2 gigs.
-            int size = mInput.available();
-            byte[] buffer = new byte[size];
-            mInput.read(buffer);
-            mInput.close();
+            //int size = mInput.available();
+            //byte[] buffer = new byte[size];
+            //mInput.read(buffer);
+
+			byte[] buffer = new byte[1024];
+			ByteArrayBuffer ba = new ByteArrayBuffer(1024);
+			int len = 0;
+			while ((len = mInput.read(buffer)) != -1) {
+				ba.append(buffer, 0, len);
+			}
  
             // byte buffer into a string
-            String text = new String(buffer);
+            String text = new String(ba.toByteArray());
+            
+            
             Gson gson = new Gson();
             stocklist = gson.fromJson(text, StockList.class);
 			
+            mInput.close();
+            
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
