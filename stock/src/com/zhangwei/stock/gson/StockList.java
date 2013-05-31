@@ -45,10 +45,10 @@ public class StockList {
 				index = shangzheng_list.indexOf(stockID);
 			}else if(shenzheng_list.contains(stockID)){
 				found = true;
-				index = shangzheng_list.indexOf(stockID) + shangzheng_list.size();
+				index = shenzheng_list.indexOf(stockID) + shangzheng_list.size();
 			}else if(chuangye_list.contains(stockID)){
 				found = true;
-				index = shangzheng_list.indexOf(stockID) + shangzheng_list.size() + shenzheng_list.size();
+				index = chuangye_list.indexOf(stockID) + shangzheng_list.size() + shenzheng_list.size();
 			}
 		}
 		
@@ -61,6 +61,7 @@ public class StockList {
 	}
 	
 	public void next(){
+		seekTo(lastScanID);
 		index++;
 		
 		int sh_size = shangzheng_list.size();

@@ -276,6 +276,8 @@ public class DailyStockScanService extends ZService {
 			int errCount = 0; //连续出错计数
 			int retry = 0; //重试计数
 			
+			//stocklist.setlastScanID("sz300355");
+			
 			do{
 				Log.e(TAG, " lastStockID:" + curScanStockID + " errCount:" + errCount + " retry:" + retry);
 				if(errCount<1){
@@ -338,7 +340,7 @@ public class DailyStockScanService extends ZService {
 					break;
 				}
 				
-/*				stocklist.next();
+				/*stocklist.next();
 				stocklist.setlastScanTime(System.currentTimeMillis());*/
 				
 				Stock stock = TencentStockHelper.getInstance().get_stock_from_tencent(curScanStockID);
