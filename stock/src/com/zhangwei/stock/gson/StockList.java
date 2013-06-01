@@ -55,14 +55,7 @@ public class StockList {
 		return found;
 	}
 	
-	public void rewind(){
-		index=0;
-		lastScanID = null;
-	}
-	
-	public void next(){
-		seekTo(lastScanID);
-		index++;
+	private void seekTo(int index){
 		
 		int sh_size = shangzheng_list.size();
 		int sz_size = shenzheng_list.size();
@@ -81,6 +74,19 @@ public class StockList {
 			//no-op
 			lastScanID = TAIL;
 		}
+	}
+	
+	public void rewind(){
+		index=0;
+		seekTo(index);
+	}
+	
+	public void next(){
+		seekTo(lastScanID);
+		index++;
+		seekTo(index);
+		
+
 	}
 	
 	public String getCurStockID(){		
