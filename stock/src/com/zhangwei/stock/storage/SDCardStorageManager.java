@@ -6,6 +6,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Locale;
@@ -204,6 +206,7 @@ public class SDCardStorageManager {
 		FileOutputStream mOutput = null;
 		StorageValue result = null;
 		String key;
+		FileChannel fcout;
 		
 		if(dir!=null){
 			key = dir + "/" + CHACHE_PREFIX + file;
@@ -240,9 +243,13 @@ public class SDCardStorageManager {
 
 
 			mOutput = new FileOutputStream(dataFile, false);
+			fcout = mOutput.getChannel();
+			ByteBuffer wBuffer = ByteBuffer.wrap(objStr.getBytes());
+			fcout.write(wBuffer);
+			fcout.close();
 			
 			//mOutput.write(ZipUtil.compress(objStr).getBytes());
-			mOutput.write(objStr.getBytes());
+			//mOutput.write(objStr.getBytes());
 			mOutput.close();
 			synchronized (cache) {
 				result = cache.put(key, new StorageValue(key, objStr.getBytes().length));	
