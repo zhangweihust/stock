@@ -279,7 +279,7 @@ public class DailyStockScanService extends ZService {
 			//stocklist.setlastScanID("sz300355");
 			
 			do{
-				Log.e(TAG, " lastStockID:" + curScanStockID + " errCount:" + errCount + " retry:" + retry);
+				Log.e(TAG, " curScanStockID:" + curScanStockID + " errCount:" + errCount + " retry:" + retry);
 				if(errCount<1){
 					curScanStockID = stocklist.getCurStockID();
 					Date lastscan_day = new Date(stocklist.getlastScanTime());
@@ -288,7 +288,7 @@ public class DailyStockScanService extends ZService {
 					if(curScanStockID.equals(StockList.TAIL)){
 						if(DateUtils.compareDay(lastscan_day, now_day)==0){
 							Log.e(TAG,"last scan time is the same day of the today, ingore");
-							completeID = null;//StockList.TAIL;
+							completeID = StockList.TAIL;
 							break;
 						}else{
 							//new day
@@ -395,7 +395,18 @@ public class DailyStockScanService extends ZService {
 		
 		protected void onPostExecute(String result) {  
 			if(!isAbort && completeID!=null &&  completeID.equals(StockList.TAIL)){
-				handler.sendEmptyMessage(HANDLER_FLAG_TASK_COMPLETE);
+				StockList stocklist = StockListHelper.getInstance().getStockList();
+				Date lastNotify_day = new Date(stocklist.getlastNotifyTime());
+				Date now_day = new Date();
+				
+				if(DateUtils.compareDay(lastNotify_day, now_day)!=0){
+					//different day, notify once
+					handler.sendEmptyMessage(HANDLER_FLAG_TASK_COMPLETE);
+					stocklist.setlastNotifyTime(System.currentTimeMillis());
+					StockListHelper.getInstance().persistStockList(stocklist);
+				}
+				
+
 			}
 		}  
 	}

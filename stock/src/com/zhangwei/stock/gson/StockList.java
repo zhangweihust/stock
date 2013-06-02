@@ -4,10 +4,6 @@ import java.util.ArrayList;
 
 public class StockList {
 	//////////////////////////////////////////
-	public ArrayList<String> shangzheng_list; //"sh600000", 上证
-	public ArrayList<String>  shenzheng_list;  //"sz000858", 深证
-	public ArrayList<String>  chuangye_list;   //"sz300005", 创业板
-	
 	public int status; //1 when ok
 	public long last_modify;  //列表上次更新时间
 	
@@ -20,6 +16,17 @@ public class StockList {
 	 *  {@literal 上次完成列表扫描的时间}
 	 * */
 	long lastScanTime;
+	
+	/**
+	 *  {@literal 上次完成发出通知的时间}
+	 * */
+	long lastNotifyTime;
+	
+	public ArrayList<String> shangzheng_list; //"sh600000", 上证
+	public ArrayList<String>  shenzheng_list;  //"sz000858", 深证
+	public ArrayList<String>  chuangye_list;   //"sz300005", 创业板
+	
+
 	////////////////////////////////////////////
 
 	public transient static String ID = "_StockList_";
@@ -110,5 +117,12 @@ public class StockList {
 		lastScanTime = time;
 	}
 	
+	public long getlastNotifyTime(){
+		return lastNotifyTime;
+	}
+	
+	public void setlastNotifyTime(long time){
+		lastNotifyTime = time;
+	}
 
 }
