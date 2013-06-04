@@ -285,6 +285,10 @@ public class DailyStockScanService extends ZService {
 					Date lastscan_day = new Date(stocklist.getlastScanTime());
 					Date now_day = new Date();
 					
+					if(curScanStockID==null){
+						break;
+					}
+					
 					if(curScanStockID.equals(StockList.TAIL)){
 						if(DateUtils.compareDay(lastscan_day, now_day)==0){
 							Log.e(TAG,"last scan time is the same day of the today, ingore");
