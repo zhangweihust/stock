@@ -276,7 +276,7 @@ public class DailyStockScanService extends ZService {
 			int errCount = 0; //连续出错计数
 			int retry = 0; //重试计数
 			
-			//stocklist.setlastScanID("sz300355");
+			//stocklist.setlastScanID("sz300282");
 			
 			do{
 				Log.e(TAG, " curScanStockID:" + curScanStockID + " errCount:" + errCount + " retry:" + retry);

@@ -42,7 +42,7 @@ public class SDCardStorageManager {
 
 	private static final String TAG = "SDCardStorageManager";
 	private static SDCardStorageManager instance;
-	private HashMap<String, StorageValue> cache;
+	//private HashMap<String, StorageValue> cache;
 	private Context context;
 	private Gson gson;
 	
@@ -50,7 +50,7 @@ public class SDCardStorageManager {
 
 	private SDCardStorageManager() {
 		context = ZApplication.getInstance();
-		cache = new HashMap<String, StorageValue>();
+		//cache = new HashMap<String, StorageValue>();
 		gson = new Gson();
 		if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
 			File appDataPath = new File(Environment.getExternalStorageDirectory(), storage_dir_in_sdcard);
@@ -75,9 +75,9 @@ public class SDCardStorageManager {
 				String key = f.getAbsolutePath()
 						      .substring(app_data_dir.length()+1);
 				Log.e(TAG, "cache.put key:" + key);
-				synchronized (cache) {
+/*				synchronized (cache) {
 					cache.put(key, new StorageValue(key, (int) f.length()));
-				}
+				}*/
 
 			}else if(f.isDirectory()){
 				//load(f.getPath()) ; 
@@ -113,11 +113,12 @@ public class SDCardStorageManager {
 			key = CHACHE_PREFIX + file;
 		}
 		
-		boolean exist = false;
+/*		boolean exist = false;
 		synchronized (cache) {
 			exist = cache.containsKey(key);
-		}
+		}*/
 
+		boolean exist = true;
 
 		if (exist) {
 			// Read the created file and display to the screen
@@ -251,9 +252,10 @@ public class SDCardStorageManager {
 			//mOutput.write(ZipUtil.compress(objStr).getBytes());
 			//mOutput.write(objStr.getBytes());
 			mOutput.close();
-			synchronized (cache) {
+/*			synchronized (cache) {
 				result = cache.put(key, new StorageValue(key, objStr.getBytes().length));	
-			}
+			}*/
+			result = new StorageValue(key, objStr.getBytes().length);
 
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
@@ -297,7 +299,7 @@ public class SDCardStorageManager {
 			key = CHACHE_PREFIX + file;
 		}
 		//String key = MD5.encode(CHACHE_PREFIX, uri.getBytes());
-		if (cache.containsKey(key)) {
+/*		if (cache.containsKey(key)) {
 			cache.remove(key);
 			//context.deleteFile(key);
 			File dataFile= new File(app_data_dir + "/"  + key);
@@ -306,11 +308,16 @@ public class SDCardStorageManager {
 			}
 
 			
+		}*/
+		//context.deleteFile(key);
+		File dataFile= new File(app_data_dir + "/"  + key);
+		if(dataFile.isFile()){
+			dataFile.delete();
 		}
 	}
 
 	public void cleanAll() {
-		Iterator<Entry<String, StorageValue>> iter = cache.entrySet()
+/*		Iterator<Entry<String, StorageValue>> iter = cache.entrySet()
 				.iterator();
 
 		while (iter.hasNext()) {
@@ -324,7 +331,7 @@ public class SDCardStorageManager {
 			}
 		}
 
-		cache.clear();
+		cache.clear();*/
 
 	}
 	
