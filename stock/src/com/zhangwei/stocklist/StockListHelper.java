@@ -177,23 +177,50 @@ public class StockListHelper {
 	 *  false 未改变
 	 * */
 	public static boolean isChangeStock(Stock left, Stock right){
-		if(left==null || right==null){
+		if(left==null && right!=null){
 			return true;
+		}else if(left!=null && right==null){
+			return true;
+		}else if(left==null && right==null){
+			return false;
 		}
 		
+		
+		
 		boolean change = false;
-		if(!left.rank.equals(right.rank)){
+		if(isChange(left.rank, right.rank)){
 			change = true;
-		}else if(!left.info.equals(right.info)){
+		}
+		
+		if(isChange(left.info, right.info)){
 			change = true;
-		}else if(!left.trend.equals(right.trend)){
+		}
+		
+		if(isChange(left.trend, right.trend)){
 			change = true;
-		}else if(!left.quality.equals(right.quality)){
+		}
+		
+		if(isChange(left.quality, right.quality)){
 			change = true;
-		}else if(!left.YC_Time.equals(right.YC_Time)){
+		}
+		
+		if(isChange(left.YC_Time, right.YC_Time)){
+			change = true;
+		}
+				
+		return change;
+	}
+	
+	private static boolean isChange(String a, String b){
+		boolean change = false;
+		if(a==null && b !=null){
+			change = true;
+		}else if(a!=null && b==null){
+			change = true;
+		}else if(a!=null && b!=null && !a.equals(b)){
 			change = true;
 		}
 		
 		return change;
-	}
+	} 
 }
